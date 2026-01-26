@@ -1,0 +1,71 @@
+import { gql } from "@apollo/client";
+
+export const GET_CATEGORIES = gql`
+  query Categories($type: String) {
+    categories(type: $type) {
+      id
+      name
+      type
+      parentId
+      userId
+      children {
+        id
+        name
+        type
+        parentId
+      }
+    }
+  }
+`;
+
+export const GET_CATEGORY = gql`
+  query Category($id: String!) {
+    category(id: $id) {
+      id
+      name
+      type
+      parentId
+      userId
+      children {
+        id
+        name
+      }
+      parent {
+        id
+        name
+      }
+    }
+  }
+`;
+
+export const CREATE_CATEGORY = gql`
+  mutation CreateCategory($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
+      id
+      name
+      type
+      parentId
+      userId
+    }
+  }
+`;
+
+export const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory($id: String!, $input: UpdateCategoryInput!) {
+    updateCategory(id: $id, input: $input) {
+      id
+      name
+      type
+      parentId
+      userId
+    }
+  }
+`;
+
+export const DELETE_CATEGORY = gql`
+  mutation DeleteCategory($id: String!) {
+    deleteCategory(id: $id) {
+      id
+    }
+  }
+`;
