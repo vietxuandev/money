@@ -7,7 +7,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies
+# Install all dependencies (including devDependencies for build)
 RUN npm ci
 
 # Copy source code
@@ -18,6 +18,9 @@ RUN npx prisma generate
 
 # Build the application
 RUN npm run build
+
+# Verify dist folder was created
+RUN ls -la dist/
 
 # Production stage
 FROM node:18-alpine
@@ -31,9 +34,11 @@ COPY prisma ./prisma/
 # Install production dependencies only
 RUN npm ci --only=production
 
+# Generate Prisma Client in production
+RUN npx prisma generate
+
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Create a script to run migrations and start the server
 COPY docker-entrypoint.sh ./
