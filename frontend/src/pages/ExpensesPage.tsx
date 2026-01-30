@@ -195,7 +195,7 @@ export const ExpensesPage = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-card rounded-xl shadow-sm p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex justify-between items-center gap-4">
           <div>
             <h2 className="text-2xl font-bold text-card-foreground">
               {t("expenses.title")}
