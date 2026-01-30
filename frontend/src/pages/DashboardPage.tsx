@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { NumericFormat, numericFormatter } from "react-number-format";
+import { useTranslation } from "react-i18next";
+import { useSettings } from "../hooks/useSettings";
+import { formatCurrency } from "../lib/currency";
 import { useReportStatisticsQuery } from "../generated/graphql";
 import {
   PieChart,
@@ -35,6 +37,8 @@ function stringToColor(string: string) {
 }
 
 export const DashboardPage = () => {
+  const { t } = useTranslation();
+  const { currency } = useSettings();
   const [timeRange, setTimeRange] = useState<TimeRange>("MONTH");
 
   const { data, loading } = useReportStatisticsQuery({
@@ -51,32 +55,36 @@ export const DashboardPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading statistics...</div>
+        <div className="text-muted-foreground">
+          {t("dashboard.loadingStats")}
+        </div>
       </div>
     );
   }
 
-  const expenseData =
-    stats?.expenseByCategory?.map((item) => ({
-      name: item.categoryName,
-      value: item.total,
-      fill: stringToColor(item.categoryName),
-    })) || [];
+  const expenseData = stats
+    ? stats.expenseByCategory.map((item) => ({
+        name: item.categoryName,
+        value: item.total,
+        fill: stringToColor(item.categoryName),
+      }))
+    : [];
 
-  const incomeData =
-    stats?.incomeByCategory?.map((item) => ({
-      name: item.categoryName,
-      value: item.total,
-      fill: stringToColor(item.categoryName),
-    })) || [];
+  const incomeData = stats
+    ? stats.incomeByCategory.map((item) => ({
+        name: item.categoryName,
+        value: item.total,
+        fill: stringToColor(item.categoryName),
+      }))
+    : [];
 
   return (
     <div className="space-y-6">
       {/* Header with Time Range Selector */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Financial Overview
+          <h2 className="text-2xl font-bold text-card-foreground">
+            {t("dashboard.title")}
           </h2>
 
           <div className="flex gap-2 flex-wrap">
@@ -89,12 +97,12 @@ export const DashboardPage = () => {
                   px-4 py-2 rounded-lg text-sm font-medium transition
                   ${
                     timeRange === range
-                      ? "bg-indigo-600 text-white shadow-md"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "bg-accent text-foreground hover:bg-accent/80"
                   }
                 `}
                 >
-                  {range.charAt(0) + range.slice(1).toLowerCase()}
+                  {t(`dashboard.timeRange.${range.toLowerCase()}`)}
                 </button>
               ),
             )}
@@ -105,37 +113,31 @@ export const DashboardPage = () => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-linear-to-br from-emerald-500 to-emerald-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="text-sm font-medium opacity-90">Total Income</div>
+          <div className="text-sm font-medium opacity-90">
+            {t("dashboard.totalIncome")}
+          </div>
           <div className="text-3xl font-bold mt-2">
-            <NumericFormat
-              value={stats?.totalIncome || 0}
-              displayType="text"
-              thousandSeparator=","
-            />
+            {formatCurrency(stats ? stats.totalIncome : 0, currency)}
           </div>
         </div>
 
         <div className="bg-linear-to-br from-rose-500 to-rose-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="text-sm font-medium opacity-90">Total Expenses</div>
+          <div className="text-sm font-medium opacity-90">
+            {t("dashboard.totalExpenses")}
+          </div>
           <div className="text-3xl font-bold mt-2">
-            <NumericFormat
-              value={stats?.totalExpense || 0}
-              displayType="text"
-              thousandSeparator=","
-            />
+            {formatCurrency(stats ? stats.totalExpense : 0, currency)}
           </div>
         </div>
 
         <div
-          className={`bg-linear-to-br ${(stats?.balance || 0) >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-6 text-white`}
+          className={`bg-linear-to-br ${stats && stats.balance >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-6 text-white`}
         >
-          <div className="text-sm font-medium opacity-90">Balance</div>
+          <div className="text-sm font-medium opacity-90">
+            {t("dashboard.balance")}
+          </div>
           <div className="text-3xl font-bold mt-2">
-            <NumericFormat
-              value={stats?.balance || 0}
-              displayType="text"
-              thousandSeparator=","
-            />
+            {formatCurrency(stats ? stats.balance : 0, currency)}
           </div>
         </div>
       </div>
@@ -143,9 +145,9 @@ export const DashboardPage = () => {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Expense by Category - Pie Chart */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Expenses by Category
+        <div className="bg-card rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">
+            {t("dashboard.expensesByCategory")}
           </h3>
           {expenseData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -168,25 +170,23 @@ export const DashboardPage = () => {
                 ></Pie>
                 <Tooltip
                   formatter={(value: number | undefined) => [
-                    numericFormatter(String(value || 0), {
-                      thousandSeparator: ",",
-                    }),
-                    "Amount",
+                    formatCurrency(value || 0, currency),
+                    t("dashboard.amount"),
                   ]}
                 />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
-              No expense data available
+            <div className="h-64 flex items-center justify-center text-muted-foreground">
+              {t("dashboard.noData")}
             </div>
           )}
         </div>
 
         {/* Income by Category - Pie Chart */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Income by Category
+        <div className="bg-card rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-card-foreground mb-4">
+            {t("dashboard.incomesByCategory")}
           </h3>
           {incomeData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -209,26 +209,24 @@ export const DashboardPage = () => {
                 ></Pie>
                 <Tooltip
                   formatter={(value: number | undefined) => [
-                    numericFormatter(String(value || 0), {
-                      thousandSeparator: ",",
-                    }),
-                    "Amount",
+                    formatCurrency(value || 0, currency),
+                    t("dashboard.amount"),
                   ]}
                 />
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-64 flex items-center justify-center text-gray-500">
-              No income data available
+            <div className="h-64 flex items-center justify-center text-muted-foreground">
+              {t("dashboard.noData")}
             </div>
           )}
         </div>
       </div>
 
       {/* Income vs Expenses Comparison */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
-          Income vs Expenses Comparison
+      <div className="bg-card rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-card-foreground mb-6">
+          {t("dashboard.incomeVsExpenses")}
         </h3>
 
         {/* Comparison Chart */}
@@ -237,19 +235,19 @@ export const DashboardPage = () => {
             <BarChart
               data={[
                 {
-                  name: "Income",
-                  amount: stats?.totalIncome || 0,
+                  name: t("dashboard.income"),
+                  amount: stats ? stats.totalIncome : 0,
                   fill: "#10b981",
                 },
                 {
-                  name: "Expenses",
-                  amount: stats?.totalExpense || 0,
+                  name: t("dashboard.expenses"),
+                  amount: stats ? stats.totalExpense : 0,
                   fill: "#f43f5e",
                 },
                 {
-                  name: "Balance",
-                  amount: stats?.balance || 0,
-                  fill: (stats?.balance || 0) >= 0 ? "#8b5cf6" : "#f59e0b",
+                  name: t("dashboard.balance"),
+                  amount: stats ? stats.balance : 0,
+                  fill: stats && stats.balance >= 0 ? "#8b5cf6" : "#f59e0b",
                 },
               ]}
               layout="vertical"
@@ -258,17 +256,13 @@ export const DashboardPage = () => {
               <CartesianGrid strokeDasharray="3 3" horizontal={false} />
               <XAxis
                 type="number"
-                tickFormatter={(value) =>
-                  numericFormatter(String(value), { thousandSeparator: "," })
-                }
+                tickFormatter={(value) => formatCurrency(value, currency)}
               />
               <YAxis type="category" dataKey="name" width={80} />
               <Tooltip
                 formatter={(value: number | undefined) => [
-                  numericFormatter(String(value || 0), {
-                    thousandSeparator: ",",
-                  }),
-                  "Amount",
+                  formatCurrency(value || 0, currency),
+                  t("dashboard.amount"),
                 ]}
               />
               <Bar dataKey="amount" radius={[0, 8, 8, 0]} />

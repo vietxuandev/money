@@ -5,26 +5,32 @@ import {
   useLoginMutation,
   useRegisterMutation,
 } from "../generated/graphql";
+import { useLocalStorage } from "../hooks/useLocalStorage";
 import type { User } from "../generated/graphql";
-import { AuthContext } from "./AuthContextType";
+import { AuthContext } from "./auth-context";
+import { clearApolloCache } from "../lib/apollo-client";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
+  const [token, setToken, removeToken] = useLocalStorage<string | null>(
+    "token",
+    null,
+  );
 
   const {
     data: meData,
     loading: meLoading,
     error: meError,
   } = useMeQuery({
-    skip: !localStorage.getItem("token"),
+    skip: !token,
   });
 
   // Update user when data changes or handle error
   if (meData?.me && user?.id !== meData.me.id) {
     setUser(meData.me);
   } else if (meError) {
-    localStorage.removeItem("token");
+    removeToken();
   }
 
   const [loginMutation, { loading: loginLoading }] = useLoginMutation();
@@ -39,8 +45,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      if (data?.login) {
-        localStorage.setItem("token", data.login.accessToken);
+      if (data && data.login) {
+        setToken(data.login.accessToken);
         setUser(data.login.user);
         navigate("/dashboard");
       }
@@ -58,8 +64,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      if (data?.register) {
-        localStorage.setItem("token", data.register.accessToken);
+      if (data && data.register) {
+        setToken(data.register.accessToken);
         setUser(data.register.user);
         navigate("/dashboard");
       }
@@ -70,7 +76,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    removeToken();
+    clearApolloCache();
     setUser(null);
     navigate("/login");
   };

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { format, parseISO } from "date-fns";
 import { NumericFormat } from "react-number-format";
+import { useTranslation } from "react-i18next";
+import { useSettings } from "../hooks/useSettings";
+import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { Pagination } from "../components/Pagination";
+import { usePagination } from "../hooks/usePagination";
 import {
   Dialog,
   DialogContent,
@@ -9,29 +17,45 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import {
-  useExpensesQuery,
+  usePaginatedExpensesQuery,
   useCategoriesQuery,
   useCreateExpenseMutation,
   useUpdateExpenseMutation,
   useDeleteExpenseMutation,
-  ExpensesDocument,
+  PaginatedExpensesDocument,
+  CategoriesDocument,
   ReportStatisticsDocument,
-  type ExpensesQuery,
+  type PaginatedExpensesQuery,
 } from "../generated/graphql";
 
-type ExpenseFormData = {
-  amount: string;
-  date: string;
-  note: string;
-  categoryId: string;
-};
+const expenseSchema = z.object({
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num > 0;
+      },
+      { message: "Amount must be greater than 0" },
+    ),
+  date: z.string().min(1, "Date is required"),
+  categoryId: z.string().min(1, "Category is required"),
+  note: z.string().optional(),
+});
+
+type ExpenseFormData = z.infer<typeof expenseSchema>;
 
 export const ExpensesPage = () => {
+  const { t } = useTranslation();
+  const { currency } = useSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<
-    ExpensesQuery["expenses"][number] | null
+    PaginatedExpensesQuery["paginatedExpenses"]["items"][number] | null
   >(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const { currentPage, itemsPerPage, setCurrentPage, setItemsPerPage } =
+    usePagination();
 
   const {
     register,
@@ -40,22 +64,36 @@ export const ExpensesPage = () => {
     control,
     formState: { errors },
   } = useForm<ExpenseFormData>({
+    resolver: zodResolver(expenseSchema),
     defaultValues: {
       amount: "",
-      date: new Date().toISOString().split("T")[0],
+      date: format(new Date(), "yyyy-MM-dd"),
       note: "",
       categoryId: "",
     },
   });
 
-  const { data: expensesData, loading } = useExpensesQuery();
+  const { data: expensesData, loading } = usePaginatedExpensesQuery({
+    variables: {
+      pagination: {
+        page: currentPage,
+        limit: itemsPerPage,
+      },
+    },
+  });
   const { data: categoriesData } = useCategoriesQuery({
     variables: { type: "EXPENSE" },
   });
 
   const [createExpense] = useCreateExpenseMutation({
     refetchQueries: [
-      { query: ExpensesDocument },
+      {
+        query: PaginatedExpensesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -66,7 +104,13 @@ export const ExpensesPage = () => {
 
   const [updateExpense] = useUpdateExpenseMutation({
     refetchQueries: [
-      { query: ExpensesDocument },
+      {
+        query: PaginatedExpensesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -77,7 +121,13 @@ export const ExpensesPage = () => {
 
   const [deleteExpense] = useDeleteExpenseMutation({
     refetchQueries: [
-      { query: ExpensesDocument },
+      {
+        query: PaginatedExpensesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -102,11 +152,13 @@ export const ExpensesPage = () => {
     }
   };
 
-  const handleEdit = (expense: ExpensesQuery["expenses"][number]) => {
+  const handleEdit = (
+    expense: PaginatedExpensesQuery["paginatedExpenses"]["items"][number],
+  ) => {
     setEditingExpense(expense);
     reset({
       amount: expense.amount.toString(),
-      date: new Date(expense.date).toISOString().split("T")[0],
+      date: format(parseISO(expense.date), "yyyy-MM-dd"),
       note: expense.note || "",
       categoryId: expense.categoryId,
     });
@@ -129,111 +181,116 @@ export const ExpensesPage = () => {
     setEditingExpense(null);
     reset({
       amount: "",
-      date: new Date().toISOString().split("T")[0],
+      date: format(new Date(), "yyyy-MM-dd"),
       note: "",
       categoryId: "",
     });
   };
 
   const categories = categoriesData?.categories || [];
-  const expenses = expensesData?.expenses || [];
-
-  const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const expenses = expensesData?.paginatedExpenses.items || [];
+  const pageInfo = expensesData?.paginatedExpenses.pageInfo;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Expenses</h2>
-            <p className="text-gray-600 mt-1">
-              Total:{" "}
-              <NumericFormat
-                value={totalExpenses}
-                displayType="text"
-                thousandSeparator=","
-              />
-            </p>
+            <h2 className="text-2xl font-bold text-card-foreground">
+              {t("expenses.title")}
+            </h2>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition shadow-md"
           >
-            + Add Expense
+            + {t("expenses.addExpense")}
           </button>
         </div>
       </div>
 
       {/* Expenses List */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Loading expenses...
+          <div className="p-8 text-center text-muted-foreground">
+            {t("expenses.loadingExpenses")}
           </div>
         ) : expenses.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No expenses yet. Add your first expense!
+          <div className="p-8 text-center text-muted-foreground">
+            {t("expenses.noExpensesYet")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.date")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.category")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Note
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.note")}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.amount")}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {expenses.map((expense) => (
-                  <tr key={expense.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(expense.date).toLocaleDateString()}
+                  <tr key={expense.id} className="hover:bg-accent">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {format(parseISO(expense.date), "MMM d, yyyy")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {expense.category?.name}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {expense.category.name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {expense.note || "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-rose-600 text-right">
-                      <NumericFormat
-                        value={expense.amount}
-                        displayType="text"
-                        thousandSeparator=","
-                      />
+                      {formatCurrency(expense.amount, currency)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleEdit(expense)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        className="text-primary hover:text-primary/80 mr-4"
                       >
-                        Edit
+                        {t("common.edit")}
                       </button>
                       <button
                         onClick={() => handleDelete(expense.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        Delete
+                        {t("common.delete")}
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {pageInfo && (
+          <div className="px-6 pb-6">
+            <Pagination
+              currentPage={pageInfo.page}
+              totalPages={pageInfo.totalPages}
+              hasNextPage={pageInfo.hasNextPage}
+              hasPreviousPage={pageInfo.hasPreviousPage}
+              totalItems={pageInfo.total}
+              itemsPerPage={pageInfo.limit}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         )}
       </div>
@@ -249,22 +306,12 @@ export const ExpensesPage = () => {
 
           <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Amount
               </label>
               <Controller
                 name="amount"
                 control={control}
-                rules={{
-                  required: "Amount is required",
-                  validate: (value) => {
-                    const num = parseFloat(value);
-                    if (isNaN(num) || num <= 0) {
-                      return "Amount must be greater than 0";
-                    }
-                    return true;
-                  },
-                }}
                 render={({ field }) => (
                   <NumericFormat
                     value={field.value}
@@ -274,7 +321,7 @@ export const ExpensesPage = () => {
                     thousandSeparator=","
                     allowNegative={false}
                     valueIsNumericString
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="0"
                   />
                 )}
@@ -287,15 +334,13 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Date
               </label>
               <input
                 type="date"
-                {...register("date", {
-                  required: "Date is required",
-                })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("date")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
               {errors.date && (
                 <p className="mt-1 text-sm text-red-600">
@@ -305,14 +350,12 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Category
               </label>
               <select
-                {...register("categoryId", {
-                  required: "Category is required",
-                })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("categoryId")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">Select a category</option>
                 {categories
@@ -336,12 +379,12 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Note (Optional)
               </label>
               <textarea
                 {...register("note")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 rows={3}
               />
             </div>
@@ -350,13 +393,13 @@ export const ExpensesPage = () => {
               <button
                 type="button"
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                className="flex-1 px-4 py-2 border border-input text-foreground rounded-lg hover:bg-accent transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
               >
                 {editingExpense ? "Update" : "Create"}
               </button>

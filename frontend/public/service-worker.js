@@ -37,6 +37,24 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Skip caching for dev server requests and source files
+  const url = new URL(event.request.url);
+  if (
+    url.hostname === "localhost" &&
+    (url.port === "5173" || // Vite dev server
+      url.pathname.includes(".tsx") ||
+      url.pathname.includes(".ts") ||
+      url.pathname.includes("/src/") ||
+      url.pathname.includes("/@"))
+  ) {
+    return;
+  }
+
+  // Skip caching API requests
+  if (url.pathname.startsWith("/graphql") || url.port === "4000") {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {

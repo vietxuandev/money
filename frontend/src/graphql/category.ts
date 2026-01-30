@@ -18,6 +18,34 @@ export const GET_CATEGORIES = gql`
   }
 `;
 
+export const GET_PAGINATED_CATEGORIES = gql`
+  query PaginatedCategories($pagination: PaginationInput!, $type: String) {
+    paginatedCategories(pagination: $pagination, type: $type) {
+      items {
+        id
+        name
+        type
+        parentId
+        userId
+        children {
+          id
+          name
+          type
+          parentId
+        }
+      }
+      pageInfo {
+        total
+        page
+        limit
+        totalPages
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORY = gql`
   query Category($id: String!) {
     category(id: $id) {

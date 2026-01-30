@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import {
   Dialog,
@@ -17,7 +21,20 @@ import {
 } from "../generated/graphql";
 import type { CategoryType } from "../generated/graphql";
 
+const categorySchema = z.object({
+  name: z
+    .string()
+    .min(1, "Category name is required")
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name must not exceed 50 characters"),
+  type: z.enum(["EXPENSE", "INCOME"]),
+  parentId: z.string().optional(),
+});
+
+type CategoryFormData = z.infer<typeof categorySchema>;
+
 export const CategoriesPage = () => {
+  const { t } = useTranslation();
   const [categoryType, setCategoryType] = useState<CategoryType>("EXPENSE");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<
@@ -26,10 +43,18 @@ export const CategoriesPage = () => {
     | null
   >(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    type: "EXPENSE" as CategoryType,
-    parentId: "",
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CategoryFormData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: {
+      name: "",
+      type: "EXPENSE",
+      parentId: "",
+    },
   });
 
   const { data, loading } = useCategoriesQuery({
@@ -38,7 +63,8 @@ export const CategoriesPage = () => {
 
   const [createCategory] = useCreateCategoryMutation({
     refetchQueries: [
-      { query: CategoriesDocument },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -49,7 +75,8 @@ export const CategoriesPage = () => {
 
   const [updateCategory] = useUpdateCategoryMutation({
     refetchQueries: [
-      { query: CategoriesDocument },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -60,19 +87,18 @@ export const CategoriesPage = () => {
 
   const [deleteCategory] = useDeleteCategoryMutation({
     refetchQueries: [
-      { query: CategoriesDocument },
+      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const onSubmit = async (data: CategoryFormData) => {
     const input = {
-      name: formData.name,
-      type: formData.type,
-      parentId: formData.parentId || null,
+      name: data.name,
+      type: data.type,
+      parentId: data.parentId || null,
     };
 
     if (editingCategory) {
@@ -92,7 +118,7 @@ export const CategoriesPage = () => {
       | NonNullable<CategoriesQuery["categories"][number]["children"]>[number],
   ) => {
     setEditingCategory(category);
-    setFormData({
+    reset({
       name: category.name,
       type: category.type,
       parentId: category.parentId || "",
@@ -114,7 +140,7 @@ export const CategoriesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingCategory(null);
-    setFormData({
+    reset({
       name: "",
       type: categoryType,
       parentId: "",
@@ -127,20 +153,24 @@ export const CategoriesPage = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Categories</h2>
-            <p className="text-gray-600 mt-1">Manage your category hierarchy</p>
+            <h2 className="text-2xl font-bold text-card-foreground">
+              {t("categories.title")}
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              {t("common.manageCategoryHierarchy")}
+            </p>
           </div>
           <button
             onClick={() => {
-              setFormData({ ...formData, type: categoryType });
+              reset({ type: categoryType });
               setIsModalOpen(true);
             }}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition shadow-md"
           >
-            + Add Category
+            + {t("categories.addCategory")}
           </button>
         </div>
 
@@ -151,91 +181,91 @@ export const CategoriesPage = () => {
             className={`px-4 py-2 rounded-lg font-medium transition ${
               categoryType === "EXPENSE"
                 ? "bg-rose-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-accent text-foreground hover:bg-accent/80"
             }`}
           >
-            💸 Expenses
+            💸 {t("categories.expenseCategories")}
           </button>
           <button
             onClick={() => setCategoryType("INCOME")}
             className={`px-4 py-2 rounded-lg font-medium transition ${
               categoryType === "INCOME"
                 ? "bg-emerald-600 text-white shadow-md"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                : "bg-accent text-foreground hover:bg-accent/80"
             }`}
           >
-            💰 Incomes
+            💰 {t("categories.incomeCategories")}
           </button>
         </div>
       </div>
 
       {/* Categories List */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         {loading ? (
-          <div className="text-center text-gray-500 py-8">
-            Loading categories...
+          <div className="text-center text-muted-foreground py-8">
+            {t("common.loadingCategories")}
           </div>
         ) : categories.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
-            No categories yet. Add your first category!
+          <div className="text-center text-muted-foreground py-8">
+            {t("common.noCategoriesYet")}
           </div>
         ) : (
           <div className="space-y-4">
             {parentCategories.map((parent) => (
               <div
                 key={parent.id}
-                className="border border-gray-200 rounded-lg overflow-hidden"
+                className="border border-border rounded-lg overflow-hidden"
               >
                 {/* Parent Category */}
-                <div className="bg-gray-50 px-6 py-4 flex justify-between items-center">
+                <div className="bg-muted px-6 py-4 flex justify-between items-center">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-card-foreground">
                       {parent.name}
                     </h3>
-                    <p className="text-sm text-gray-600">
-                      {parent.children?.length || 0} subcategories
+                    <p className="text-sm text-muted-foreground">
+                      {parent.children?.length || 0} {t("common.subcategories")}
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(parent)}
-                      className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-900 font-medium"
+                      className="px-3 py-1 text-sm text-primary hover:text-primary/80 font-medium"
                     >
-                      Edit
+                      {t("common.edit")}
                     </button>
                     <button
                       onClick={() => handleDelete(parent.id)}
                       className="px-3 py-1 text-sm text-red-600 hover:text-red-900 font-medium"
                     >
-                      Delete
+                      {t("common.delete")}
                     </button>
                   </div>
                 </div>
 
                 {/* Child Categories */}
                 {parent.children && parent.children.length > 0 && (
-                  <div className="bg-white divide-y divide-gray-200">
+                  <div className="bg-card divide-y divide-border">
                     {parent.children.map((child) => (
                       <div
                         key={child.id}
-                        className="px-6 py-3 flex justify-between items-center hover:bg-gray-50"
+                        className="px-6 py-3 flex justify-between items-center hover:bg-accent"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-400">└─</span>
-                          <span className="text-gray-900">{child.name}</span>
+                          <span className="text-muted-foreground">└─</span>
+                          <span className="text-foreground">{child.name}</span>
                         </div>
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEdit(child)}
-                            className="px-3 py-1 text-sm text-indigo-600 hover:text-indigo-900 font-medium"
+                            className="px-3 py-1 text-sm text-primary hover:text-primary/80 font-medium"
                           >
-                            Edit
+                            {t("common.edit")}
                           </button>
                           <button
                             onClick={() => handleDelete(child.id)}
                             className="px-3 py-1 text-sm text-red-600 hover:text-red-900 font-medium"
                           >
-                            Delete
+                            {t("common.delete")}
                           </button>
                         </div>
                       </div>
@@ -257,36 +287,31 @@ export const CategoriesPage = () => {
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Category Name
               </label>
               <input
                 type="text"
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData({ ...formData, name: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("name")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="e.g., Food, Salary"
-                required
               />
+              {errors.name && (
+                <span className="text-destructive text-sm">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Type
               </label>
               <select
-                value={formData.type}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    type: e.target.value as CategoryType,
-                  })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("type")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 disabled={!!editingCategory}
               >
                 <option value="EXPENSE">Expense</option>
@@ -295,15 +320,12 @@ export const CategoriesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Parent Category (Optional)
               </label>
               <select
-                value={formData.parentId}
-                onChange={(e) =>
-                  setFormData({ ...formData, parentId: e.target.value })
-                }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("parentId")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">None (Top Level)</option>
                 {parentCategories
@@ -314,7 +336,7 @@ export const CategoriesPage = () => {
                     </option>
                   ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Select a parent to create a subcategory
               </p>
             </div>
@@ -323,13 +345,13 @@ export const CategoriesPage = () => {
               <button
                 type="button"
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                className="flex-1 px-4 py-2 border border-input text-foreground rounded-lg hover:bg-accent transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
               >
                 {editingCategory ? "Update" : "Create"}
               </button>

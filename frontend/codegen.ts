@@ -1,6 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
+  overwrite: true,
   schema: "http://localhost:4000/graphql",
   documents: ["src/**/*.{ts,tsx}"],
   generates: {
@@ -11,6 +12,10 @@ const config: CodegenConfig = {
         "typescript-react-apollo",
       ],
       config: {
+        avoidOptionals: {
+          field: true,
+          inputValue: false,
+        },
         withHooks: true,
         withHOC: false,
         withComponent: false,
@@ -21,10 +26,14 @@ const config: CodegenConfig = {
         scalars: {
           DateTime: "string",
         },
+        defaultScalarType: "unknown",
+        nonOptionalTypename: true,
+        skipTypeNameForRoot: true,
       },
     },
   },
   ignoreNoDocuments: true,
+  require: "ts-node/register",
 };
 
 export default config;

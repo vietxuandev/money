@@ -20,24 +20,24 @@ export type Scalars = {
 };
 
 export type AuthPayload = {
-  __typename?: 'AuthPayload';
+  __typename: 'AuthPayload';
   accessToken: Scalars['String']['output'];
   user: User;
 };
 
 export type Category = {
-  __typename?: 'Category';
-  children?: Maybe<Array<Category>>;
+  __typename: 'Category';
+  children: Maybe<Array<Category>>;
   id: Scalars['String']['output'];
   name: Scalars['String']['output'];
-  parent?: Maybe<Category>;
-  parentId?: Maybe<Scalars['String']['output']>;
+  parent: Maybe<Category>;
+  parentId: Maybe<Scalars['String']['output']>;
   type: CategoryType;
   userId: Scalars['String']['output'];
 };
 
 export type CategorySummary = {
-  __typename?: 'CategorySummary';
+  __typename: 'CategorySummary';
   categoryId: Scalars['String']['output'];
   categoryName: Scalars['String']['output'];
   count: Scalars['Float']['output'];
@@ -57,38 +57,43 @@ export type CreateCategoryInput = {
 export type CreateExpenseInput = {
   amount: Scalars['Float']['input'];
   categoryId: Scalars['String']['input'];
-  date: Scalars['DateTime']['input'];
+  date: Scalars['String']['input'];
   note?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateIncomeInput = {
   amount: Scalars['Float']['input'];
   categoryId: Scalars['String']['input'];
-  date: Scalars['DateTime']['input'];
+  date: Scalars['String']['input'];
   note?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** User preferred currency */
+export type Currency =
+  | 'USD'
+  | 'VND';
+
 export type Expense = {
-  __typename?: 'Expense';
+  __typename: 'Expense';
   amount: Scalars['Float']['output'];
   category: Category;
   categoryId: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   date: Scalars['DateTime']['output'];
   id: Scalars['String']['output'];
-  note?: Maybe<Scalars['String']['output']>;
+  note: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
 export type Income = {
-  __typename?: 'Income';
+  __typename: 'Income';
   amount: Scalars['Float']['output'];
   category: Category;
   categoryId: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   date: Scalars['DateTime']['output'];
   id: Scalars['String']['output'];
-  note?: Maybe<Scalars['String']['output']>;
+  note: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
 };
 
@@ -98,7 +103,7 @@ export type LoginInput = {
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
+  __typename: 'Mutation';
   createCategory: Category;
   createExpense: Expense;
   createIncome: Income;
@@ -110,6 +115,7 @@ export type Mutation = {
   updateCategory: Category;
   updateExpense: Expense;
   updateIncome: Income;
+  updateUserSettings: UserSetting;
 };
 
 
@@ -170,16 +176,58 @@ export type MutationUpdateIncomeArgs = {
   input: UpdateIncomeInput;
 };
 
+
+export type MutationUpdateUserSettingsArgs = {
+  input: UpdateSettingInput;
+};
+
+export type PageInfo = {
+  __typename: 'PageInfo';
+  hasNextPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars['Boolean']['output'];
+  limit: Scalars['Int']['output'];
+  page: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+  totalPages: Scalars['Int']['output'];
+};
+
+export type PaginatedCategories = {
+  __typename: 'PaginatedCategories';
+  items: Array<Category>;
+  pageInfo: PageInfo;
+};
+
+export type PaginatedExpenses = {
+  __typename: 'PaginatedExpenses';
+  items: Array<Expense>;
+  pageInfo: PageInfo;
+};
+
+export type PaginatedIncomes = {
+  __typename: 'PaginatedIncomes';
+  items: Array<Income>;
+  pageInfo: PageInfo;
+};
+
+export type PaginationInput = {
+  limit?: Scalars['Int']['input'];
+  page?: Scalars['Int']['input'];
+};
+
 export type Query = {
-  __typename?: 'Query';
+  __typename: 'Query';
   categories: Array<Category>;
-  category?: Maybe<Category>;
-  expense?: Maybe<Expense>;
+  category: Maybe<Category>;
+  expense: Maybe<Expense>;
   expenses: Array<Expense>;
-  income?: Maybe<Income>;
+  income: Maybe<Income>;
   incomes: Array<Income>;
   me: User;
+  paginatedCategories: PaginatedCategories;
+  paginatedExpenses: PaginatedExpenses;
+  paginatedIncomes: PaginatedIncomes;
   reportStatistics: ReportStatistics;
+  userSettings: UserSetting;
 };
 
 
@@ -215,6 +263,26 @@ export type QueryIncomesArgs = {
 };
 
 
+export type QueryPaginatedCategoriesArgs = {
+  pagination: PaginationInput;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryPaginatedExpensesArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  pagination: PaginationInput;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
+export type QueryPaginatedIncomesArgs = {
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  pagination: PaginationInput;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
 export type QueryReportStatisticsArgs = {
   range: Scalars['String']['input'];
   referenceDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -226,7 +294,7 @@ export type RegisterInput = {
 };
 
 export type ReportStatistics = {
-  __typename?: 'ReportStatistics';
+  __typename: 'ReportStatistics';
   balance: Scalars['Float']['output'];
   endDate: Scalars['DateTime']['output'];
   expenseByCategory: Array<CategorySummary>;
@@ -235,6 +303,11 @@ export type ReportStatistics = {
   totalExpense: Scalars['Float']['output'];
   totalIncome: Scalars['Float']['output'];
 };
+
+/** User interface theme */
+export type Theme =
+  | 'DARK'
+  | 'LIGHT';
 
 export type UpdateCategoryInput = {
   name?: InputMaybe<Scalars['String']['input']>;
@@ -245,22 +318,38 @@ export type UpdateCategoryInput = {
 export type UpdateExpenseInput = {
   amount?: InputMaybe<Scalars['Float']['input']>;
   categoryId?: InputMaybe<Scalars['String']['input']>;
-  date?: InputMaybe<Scalars['DateTime']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
   note?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateIncomeInput = {
   amount?: InputMaybe<Scalars['Float']['input']>;
   categoryId?: InputMaybe<Scalars['String']['input']>;
-  date?: InputMaybe<Scalars['DateTime']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
   note?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateSettingInput = {
+  currency?: InputMaybe<Currency>;
+  language?: InputMaybe<Scalars['String']['input']>;
+  theme?: InputMaybe<Theme>;
+};
+
 export type User = {
-  __typename?: 'User';
+  __typename: 'User';
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['String']['output'];
   username: Scalars['String']['output'];
+};
+
+export type UserSetting = {
+  __typename: 'UserSetting';
+  currency: Currency;
+  id: Scalars['String']['output'];
+  language: Scalars['String']['output'];
+  theme: Theme;
+  updatedAt: Scalars['DateTime']['output'];
+  userId: Scalars['String']['output'];
 };
 
 export type RegisterMutationVariables = Exact<{
@@ -268,40 +357,48 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'AuthPayload', accessToken: string, user: { __typename?: 'User', id: string, username: string, createdAt: string } } };
+export type RegisterMutation = { register: { __typename: 'AuthPayload', accessToken: string, user: { __typename: 'User', id: string, username: string, createdAt: string } } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'AuthPayload', accessToken: string, user: { __typename?: 'User', id: string, username: string, createdAt: string } } };
+export type LoginMutation = { login: { __typename: 'AuthPayload', accessToken: string, user: { __typename: 'User', id: string, username: string, createdAt: string } } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, username: string, createdAt: string } };
+export type MeQuery = { me: { __typename: 'User', id: string, username: string, createdAt: string } };
 
 export type CategoriesQueryVariables = Exact<{
   type?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type CategoriesQuery = { __typename?: 'Query', categories: Array<{ __typename?: 'Category', id: string, name: string, type: CategoryType, parentId?: string | null, userId: string, children?: Array<{ __typename?: 'Category', id: string, name: string, type: CategoryType, parentId?: string | null }> | null }> };
+export type CategoriesQuery = { categories: Array<{ __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null, userId: string, children: Array<{ __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null }> | null }> };
+
+export type PaginatedCategoriesQueryVariables = Exact<{
+  pagination: PaginationInput;
+  type?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type PaginatedCategoriesQuery = { paginatedCategories: { __typename: 'PaginatedCategories', items: Array<{ __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null, userId: string, children: Array<{ __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null }> | null }>, pageInfo: { __typename: 'PageInfo', total: number, page: number, limit: number, totalPages: number, hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 export type CategoryQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type CategoryQuery = { __typename?: 'Query', category?: { __typename?: 'Category', id: string, name: string, type: CategoryType, parentId?: string | null, userId: string, children?: Array<{ __typename?: 'Category', id: string, name: string }> | null, parent?: { __typename?: 'Category', id: string, name: string } | null } | null };
+export type CategoryQuery = { category: { __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null, userId: string, children: Array<{ __typename: 'Category', id: string, name: string }> | null, parent: { __typename: 'Category', id: string, name: string } | null } | null };
 
 export type CreateCategoryMutationVariables = Exact<{
   input: CreateCategoryInput;
 }>;
 
 
-export type CreateCategoryMutation = { __typename?: 'Mutation', createCategory: { __typename?: 'Category', id: string, name: string, type: CategoryType, parentId?: string | null, userId: string } };
+export type CreateCategoryMutation = { createCategory: { __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null, userId: string } };
 
 export type UpdateCategoryMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -309,14 +406,14 @@ export type UpdateCategoryMutationVariables = Exact<{
 }>;
 
 
-export type UpdateCategoryMutation = { __typename?: 'Mutation', updateCategory: { __typename?: 'Category', id: string, name: string, type: CategoryType, parentId?: string | null, userId: string } };
+export type UpdateCategoryMutation = { updateCategory: { __typename: 'Category', id: string, name: string, type: CategoryType, parentId: string | null, userId: string } };
 
 export type DeleteCategoryMutationVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type DeleteCategoryMutation = { __typename?: 'Mutation', deleteCategory: { __typename?: 'Category', id: string } };
+export type DeleteCategoryMutation = { deleteCategory: { __typename: 'Category', id: string } };
 
 export type ExpensesQueryVariables = Exact<{
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -324,21 +421,30 @@ export type ExpensesQueryVariables = Exact<{
 }>;
 
 
-export type ExpensesQuery = { __typename?: 'Query', expenses: Array<{ __typename?: 'Expense', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename?: 'Category', id: string, name: string, type: CategoryType } }> };
+export type ExpensesQuery = { expenses: Array<{ __typename: 'Expense', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string, type: CategoryType } }> };
+
+export type PaginatedExpensesQueryVariables = Exact<{
+  pagination: PaginationInput;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+}>;
+
+
+export type PaginatedExpensesQuery = { paginatedExpenses: { __typename: 'PaginatedExpenses', items: Array<{ __typename: 'Expense', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string, type: CategoryType } }>, pageInfo: { __typename: 'PageInfo', total: number, page: number, limit: number, totalPages: number, hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 export type ExpenseQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type ExpenseQuery = { __typename?: 'Query', expense?: { __typename?: 'Expense', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename?: 'Category', id: string, name: string } } | null };
+export type ExpenseQuery = { expense: { __typename: 'Expense', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string } } | null };
 
 export type CreateExpenseMutationVariables = Exact<{
   input: CreateExpenseInput;
 }>;
 
 
-export type CreateExpenseMutation = { __typename?: 'Mutation', createExpense: { __typename?: 'Expense', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string } };
+export type CreateExpenseMutation = { createExpense: { __typename: 'Expense', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string } };
 
 export type UpdateExpenseMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -346,14 +452,14 @@ export type UpdateExpenseMutationVariables = Exact<{
 }>;
 
 
-export type UpdateExpenseMutation = { __typename?: 'Mutation', updateExpense: { __typename?: 'Expense', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string } };
+export type UpdateExpenseMutation = { updateExpense: { __typename: 'Expense', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string } };
 
 export type DeleteExpenseMutationVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type DeleteExpenseMutation = { __typename?: 'Mutation', deleteExpense: { __typename?: 'Expense', id: string } };
+export type DeleteExpenseMutation = { deleteExpense: { __typename: 'Expense', id: string } };
 
 export type IncomesQueryVariables = Exact<{
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -361,21 +467,30 @@ export type IncomesQueryVariables = Exact<{
 }>;
 
 
-export type IncomesQuery = { __typename?: 'Query', incomes: Array<{ __typename?: 'Income', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename?: 'Category', id: string, name: string, type: CategoryType } }> };
+export type IncomesQuery = { incomes: Array<{ __typename: 'Income', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string, type: CategoryType } }> };
+
+export type PaginatedIncomesQueryVariables = Exact<{
+  pagination: PaginationInput;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+}>;
+
+
+export type PaginatedIncomesQuery = { paginatedIncomes: { __typename: 'PaginatedIncomes', items: Array<{ __typename: 'Income', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string, type: CategoryType } }>, pageInfo: { __typename: 'PageInfo', total: number, page: number, limit: number, totalPages: number, hasNextPage: boolean, hasPreviousPage: boolean } } };
 
 export type IncomeQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type IncomeQuery = { __typename?: 'Query', income?: { __typename?: 'Income', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename?: 'Category', id: string, name: string } } | null };
+export type IncomeQuery = { income: { __typename: 'Income', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string, category: { __typename: 'Category', id: string, name: string } } | null };
 
 export type CreateIncomeMutationVariables = Exact<{
   input: CreateIncomeInput;
 }>;
 
 
-export type CreateIncomeMutation = { __typename?: 'Mutation', createIncome: { __typename?: 'Income', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string, createdAt: string } };
+export type CreateIncomeMutation = { createIncome: { __typename: 'Income', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string, createdAt: string } };
 
 export type UpdateIncomeMutationVariables = Exact<{
   id: Scalars['String']['input'];
@@ -383,14 +498,14 @@ export type UpdateIncomeMutationVariables = Exact<{
 }>;
 
 
-export type UpdateIncomeMutation = { __typename?: 'Mutation', updateIncome: { __typename?: 'Income', id: string, amount: number, date: string, note?: string | null, categoryId: string, userId: string } };
+export type UpdateIncomeMutation = { updateIncome: { __typename: 'Income', id: string, amount: number, date: string, note: string | null, categoryId: string, userId: string } };
 
 export type DeleteIncomeMutationVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
 
 
-export type DeleteIncomeMutation = { __typename?: 'Mutation', deleteIncome: { __typename?: 'Income', id: string } };
+export type DeleteIncomeMutation = { deleteIncome: { __typename: 'Income', id: string } };
 
 export type ReportStatisticsQueryVariables = Exact<{
   range: Scalars['String']['input'];
@@ -398,7 +513,19 @@ export type ReportStatisticsQueryVariables = Exact<{
 }>;
 
 
-export type ReportStatisticsQuery = { __typename?: 'Query', reportStatistics: { __typename?: 'ReportStatistics', totalIncome: number, totalExpense: number, balance: number, startDate: string, endDate: string, expenseByCategory: Array<{ __typename?: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }>, incomeByCategory: Array<{ __typename?: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }> } };
+export type ReportStatisticsQuery = { reportStatistics: { __typename: 'ReportStatistics', totalIncome: number, totalExpense: number, balance: number, startDate: string, endDate: string, expenseByCategory: Array<{ __typename: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }>, incomeByCategory: Array<{ __typename: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }> } };
+
+export type UserSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UserSettingsQuery = { userSettings: { __typename: 'UserSetting', id: string, userId: string, theme: Theme, language: string, currency: Currency, updatedAt: string } };
+
+export type UpdateUserSettingsMutationVariables = Exact<{
+  input: UpdateSettingInput;
+}>;
+
+
+export type UpdateUserSettingsMutation = { updateUserSettings: { __typename: 'UserSetting', id: string, userId: string, theme: Theme, language: string, currency: Currency, updatedAt: string } };
 
 
 export const RegisterDocument = gql`
@@ -574,6 +701,70 @@ export type CategoriesQueryHookResult = ReturnType<typeof useCategoriesQuery>;
 export type CategoriesLazyQueryHookResult = ReturnType<typeof useCategoriesLazyQuery>;
 export type CategoriesSuspenseQueryHookResult = ReturnType<typeof useCategoriesSuspenseQuery>;
 export type CategoriesQueryResult = Apollo.QueryResult<CategoriesQuery, CategoriesQueryVariables>;
+export const PaginatedCategoriesDocument = gql`
+    query PaginatedCategories($pagination: PaginationInput!, $type: String) {
+  paginatedCategories(pagination: $pagination, type: $type) {
+    items {
+      id
+      name
+      type
+      parentId
+      userId
+      children {
+        id
+        name
+        type
+        parentId
+      }
+    }
+    pageInfo {
+      total
+      page
+      limit
+      totalPages
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+    `;
+
+/**
+ * __usePaginatedCategoriesQuery__
+ *
+ * To run a query within a React component, call `usePaginatedCategoriesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaginatedCategoriesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaginatedCategoriesQuery({
+ *   variables: {
+ *      pagination: // value for 'pagination'
+ *      type: // value for 'type'
+ *   },
+ * });
+ */
+export function usePaginatedCategoriesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables> & ({ variables: PaginatedCategoriesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>(PaginatedCategoriesDocument, options);
+      }
+export function usePaginatedCategoriesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>(PaginatedCategoriesDocument, options);
+        }
+// @ts-ignore
+export function usePaginatedCategoriesSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>;
+export function usePaginatedCategoriesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedCategoriesQuery | undefined, PaginatedCategoriesQueryVariables>;
+export function usePaginatedCategoriesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>(PaginatedCategoriesDocument, options);
+        }
+export type PaginatedCategoriesQueryHookResult = ReturnType<typeof usePaginatedCategoriesQuery>;
+export type PaginatedCategoriesLazyQueryHookResult = ReturnType<typeof usePaginatedCategoriesLazyQuery>;
+export type PaginatedCategoriesSuspenseQueryHookResult = ReturnType<typeof usePaginatedCategoriesSuspenseQuery>;
+export type PaginatedCategoriesQueryResult = Apollo.QueryResult<PaginatedCategoriesQuery, PaginatedCategoriesQueryVariables>;
 export const CategoryDocument = gql`
     query Category($id: String!) {
   category(id: $id) {
@@ -792,6 +983,76 @@ export type ExpensesQueryHookResult = ReturnType<typeof useExpensesQuery>;
 export type ExpensesLazyQueryHookResult = ReturnType<typeof useExpensesLazyQuery>;
 export type ExpensesSuspenseQueryHookResult = ReturnType<typeof useExpensesSuspenseQuery>;
 export type ExpensesQueryResult = Apollo.QueryResult<ExpensesQuery, ExpensesQueryVariables>;
+export const PaginatedExpensesDocument = gql`
+    query PaginatedExpenses($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime) {
+  paginatedExpenses(
+    pagination: $pagination
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    items {
+      id
+      amount
+      date
+      note
+      categoryId
+      userId
+      createdAt
+      category {
+        id
+        name
+        type
+      }
+    }
+    pageInfo {
+      total
+      page
+      limit
+      totalPages
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+    `;
+
+/**
+ * __usePaginatedExpensesQuery__
+ *
+ * To run a query within a React component, call `usePaginatedExpensesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaginatedExpensesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaginatedExpensesQuery({
+ *   variables: {
+ *      pagination: // value for 'pagination'
+ *      startDate: // value for 'startDate'
+ *      endDate: // value for 'endDate'
+ *   },
+ * });
+ */
+export function usePaginatedExpensesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<PaginatedExpensesQuery, PaginatedExpensesQueryVariables> & ({ variables: PaginatedExpensesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>(PaginatedExpensesDocument, options);
+      }
+export function usePaginatedExpensesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>(PaginatedExpensesDocument, options);
+        }
+// @ts-ignore
+export function usePaginatedExpensesSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>;
+export function usePaginatedExpensesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedExpensesQuery | undefined, PaginatedExpensesQueryVariables>;
+export function usePaginatedExpensesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>(PaginatedExpensesDocument, options);
+        }
+export type PaginatedExpensesQueryHookResult = ReturnType<typeof usePaginatedExpensesQuery>;
+export type PaginatedExpensesLazyQueryHookResult = ReturnType<typeof usePaginatedExpensesLazyQuery>;
+export type PaginatedExpensesSuspenseQueryHookResult = ReturnType<typeof usePaginatedExpensesSuspenseQuery>;
+export type PaginatedExpensesQueryResult = Apollo.QueryResult<PaginatedExpensesQuery, PaginatedExpensesQueryVariables>;
 export const ExpenseDocument = gql`
     query Expense($id: String!) {
   expense(id: $id) {
@@ -1011,6 +1272,76 @@ export type IncomesQueryHookResult = ReturnType<typeof useIncomesQuery>;
 export type IncomesLazyQueryHookResult = ReturnType<typeof useIncomesLazyQuery>;
 export type IncomesSuspenseQueryHookResult = ReturnType<typeof useIncomesSuspenseQuery>;
 export type IncomesQueryResult = Apollo.QueryResult<IncomesQuery, IncomesQueryVariables>;
+export const PaginatedIncomesDocument = gql`
+    query PaginatedIncomes($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime) {
+  paginatedIncomes(
+    pagination: $pagination
+    startDate: $startDate
+    endDate: $endDate
+  ) {
+    items {
+      id
+      amount
+      date
+      note
+      categoryId
+      userId
+      createdAt
+      category {
+        id
+        name
+        type
+      }
+    }
+    pageInfo {
+      total
+      page
+      limit
+      totalPages
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+    `;
+
+/**
+ * __usePaginatedIncomesQuery__
+ *
+ * To run a query within a React component, call `usePaginatedIncomesQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePaginatedIncomesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePaginatedIncomesQuery({
+ *   variables: {
+ *      pagination: // value for 'pagination'
+ *      startDate: // value for 'startDate'
+ *      endDate: // value for 'endDate'
+ *   },
+ * });
+ */
+export function usePaginatedIncomesQuery(baseOptions: ApolloReactHooks.QueryHookOptions<PaginatedIncomesQuery, PaginatedIncomesQueryVariables> & ({ variables: PaginatedIncomesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>(PaginatedIncomesDocument, options);
+      }
+export function usePaginatedIncomesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>(PaginatedIncomesDocument, options);
+        }
+// @ts-ignore
+export function usePaginatedIncomesSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>;
+export function usePaginatedIncomesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<PaginatedIncomesQuery | undefined, PaginatedIncomesQueryVariables>;
+export function usePaginatedIncomesSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>(PaginatedIncomesDocument, options);
+        }
+export type PaginatedIncomesQueryHookResult = ReturnType<typeof usePaginatedIncomesQuery>;
+export type PaginatedIncomesLazyQueryHookResult = ReturnType<typeof usePaginatedIncomesLazyQuery>;
+export type PaginatedIncomesSuspenseQueryHookResult = ReturnType<typeof usePaginatedIncomesSuspenseQuery>;
+export type PaginatedIncomesQueryResult = Apollo.QueryResult<PaginatedIncomesQuery, PaginatedIncomesQueryVariables>;
 export const IncomeDocument = gql`
     query Income($id: String!) {
   income(id: $id) {
@@ -1235,3 +1566,88 @@ export type ReportStatisticsQueryHookResult = ReturnType<typeof useReportStatist
 export type ReportStatisticsLazyQueryHookResult = ReturnType<typeof useReportStatisticsLazyQuery>;
 export type ReportStatisticsSuspenseQueryHookResult = ReturnType<typeof useReportStatisticsSuspenseQuery>;
 export type ReportStatisticsQueryResult = Apollo.QueryResult<ReportStatisticsQuery, ReportStatisticsQueryVariables>;
+export const UserSettingsDocument = gql`
+    query UserSettings {
+  userSettings {
+    id
+    userId
+    theme
+    language
+    currency
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useUserSettingsQuery__
+ *
+ * To run a query within a React component, call `useUserSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useUserSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserSettingsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserSettingsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<UserSettingsQuery, UserSettingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<UserSettingsQuery, UserSettingsQueryVariables>(UserSettingsDocument, options);
+      }
+export function useUserSettingsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<UserSettingsQuery, UserSettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<UserSettingsQuery, UserSettingsQueryVariables>(UserSettingsDocument, options);
+        }
+// @ts-ignore
+export function useUserSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<UserSettingsQuery, UserSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<UserSettingsQuery, UserSettingsQueryVariables>;
+export function useUserSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<UserSettingsQuery, UserSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<UserSettingsQuery | undefined, UserSettingsQueryVariables>;
+export function useUserSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<UserSettingsQuery, UserSettingsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<UserSettingsQuery, UserSettingsQueryVariables>(UserSettingsDocument, options);
+        }
+export type UserSettingsQueryHookResult = ReturnType<typeof useUserSettingsQuery>;
+export type UserSettingsLazyQueryHookResult = ReturnType<typeof useUserSettingsLazyQuery>;
+export type UserSettingsSuspenseQueryHookResult = ReturnType<typeof useUserSettingsSuspenseQuery>;
+export type UserSettingsQueryResult = Apollo.QueryResult<UserSettingsQuery, UserSettingsQueryVariables>;
+export const UpdateUserSettingsDocument = gql`
+    mutation UpdateUserSettings($input: UpdateSettingInput!) {
+  updateUserSettings(input: $input) {
+    id
+    userId
+    theme
+    language
+    currency
+    updatedAt
+  }
+}
+    `;
+export type UpdateUserSettingsMutationFn = Apollo.MutationFunction<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>;
+
+/**
+ * __useUpdateUserSettingsMutation__
+ *
+ * To run a mutation, you first call `useUpdateUserSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateUserSettingsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateUserSettingsMutation, { data, loading, error }] = useUpdateUserSettingsMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUpdateUserSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>(UpdateUserSettingsDocument, options);
+      }
+export type UpdateUserSettingsMutationHookResult = ReturnType<typeof useUpdateUserSettingsMutation>;
+export type UpdateUserSettingsMutationResult = Apollo.MutationResult<UpdateUserSettingsMutation>;
+export type UpdateUserSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateUserSettingsMutation, UpdateUserSettingsMutationVariables>;

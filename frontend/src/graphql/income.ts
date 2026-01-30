@@ -19,6 +19,43 @@ export const GET_INCOMES = gql`
   }
 `;
 
+export const GET_PAGINATED_INCOMES = gql`
+  query PaginatedIncomes(
+    $pagination: PaginationInput!
+    $startDate: DateTime
+    $endDate: DateTime
+  ) {
+    paginatedIncomes(
+      pagination: $pagination
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      items {
+        id
+        amount
+        date
+        note
+        categoryId
+        userId
+        createdAt
+        category {
+          id
+          name
+          type
+        }
+      }
+      pageInfo {
+        total
+        page
+        limit
+        totalPages
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+`;
+
 export const GET_INCOME = gql`
   query Income($id: String!) {
     income(id: $id) {

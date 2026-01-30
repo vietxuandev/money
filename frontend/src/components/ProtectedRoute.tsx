@@ -3,7 +3,13 @@ import { useAuth } from "../hooks/useAuth";
 
 export const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-  const token = localStorage.getItem("token");
+  let token = null;
+  try {
+    const tokenItem = localStorage.getItem("token");
+    token = tokenItem ? JSON.parse(tokenItem) : null;
+  } catch (error) {
+    console.error("Error parsing token from localStorage:", error);
+  }
 
   if (loading) {
     return (

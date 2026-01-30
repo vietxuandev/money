@@ -19,6 +19,43 @@ export const GET_EXPENSES = gql`
   }
 `;
 
+export const GET_PAGINATED_EXPENSES = gql`
+  query PaginatedExpenses(
+    $pagination: PaginationInput!
+    $startDate: DateTime
+    $endDate: DateTime
+  ) {
+    paginatedExpenses(
+      pagination: $pagination
+      startDate: $startDate
+      endDate: $endDate
+    ) {
+      items {
+        id
+        amount
+        date
+        note
+        categoryId
+        userId
+        createdAt
+        category {
+          id
+          name
+          type
+        }
+      }
+      pageInfo {
+        total
+        page
+        limit
+        totalPages
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+`;
+
 export const GET_EXPENSE = gql`
   query Expense($id: String!) {
     expense(id: $id) {

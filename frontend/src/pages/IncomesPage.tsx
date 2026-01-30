@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { format, parseISO } from "date-fns";
 import { NumericFormat } from "react-number-format";
+import { useTranslation } from "react-i18next";
+import { useSettings } from "../hooks/useSettings";
+import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { Pagination } from "../components/Pagination";
+import { usePagination } from "../hooks/usePagination";
 import {
   Dialog,
   DialogContent,
@@ -9,29 +17,45 @@ import {
   DialogTitle,
 } from "../components/ui/dialog";
 import {
-  useIncomesQuery,
+  usePaginatedIncomesQuery,
   useCategoriesQuery,
   useCreateIncomeMutation,
   useUpdateIncomeMutation,
   useDeleteIncomeMutation,
-  IncomesDocument,
+  PaginatedIncomesDocument,
+  CategoriesDocument,
   ReportStatisticsDocument,
-  type IncomesQuery,
+  type PaginatedIncomesQuery,
 } from "../generated/graphql";
 
-type IncomeFormData = {
-  amount: string;
-  date: string;
-  note: string;
-  categoryId: string;
-};
+const incomeSchema = z.object({
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num > 0;
+      },
+      { message: "Amount must be greater than 0" },
+    ),
+  date: z.string().min(1, "Date is required"),
+  categoryId: z.string().min(1, "Category is required"),
+  note: z.string().optional(),
+});
+
+type IncomeFormData = z.infer<typeof incomeSchema>;
 
 export const IncomesPage = () => {
+  const { t } = useTranslation();
+  const { currency } = useSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<
-    IncomesQuery["incomes"][number] | null
+    PaginatedIncomesQuery["paginatedIncomes"]["items"][number] | null
   >(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const { currentPage, itemsPerPage, setCurrentPage, setItemsPerPage } =
+    usePagination();
 
   const {
     register,
@@ -40,22 +64,36 @@ export const IncomesPage = () => {
     control,
     formState: { errors },
   } = useForm<IncomeFormData>({
+    resolver: zodResolver(incomeSchema),
     defaultValues: {
       amount: "",
-      date: new Date().toISOString().split("T")[0],
+      date: format(new Date(), "yyyy-MM-dd"),
       note: "",
       categoryId: "",
     },
   });
 
-  const { data: incomesData, loading } = useIncomesQuery();
+  const { data: incomesData, loading } = usePaginatedIncomesQuery({
+    variables: {
+      pagination: {
+        page: currentPage,
+        limit: itemsPerPage,
+      },
+    },
+  });
   const { data: categoriesData } = useCategoriesQuery({
     variables: { type: "INCOME" },
   });
 
   const [createIncome] = useCreateIncomeMutation({
     refetchQueries: [
-      { query: IncomesDocument },
+      {
+        query: PaginatedIncomesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -66,7 +104,13 @@ export const IncomesPage = () => {
 
   const [updateIncome] = useUpdateIncomeMutation({
     refetchQueries: [
-      { query: IncomesDocument },
+      {
+        query: PaginatedIncomesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -77,7 +121,13 @@ export const IncomesPage = () => {
 
   const [deleteIncome] = useDeleteIncomeMutation({
     refetchQueries: [
-      { query: IncomesDocument },
+      {
+        query: PaginatedIncomesDocument,
+        variables: {
+          pagination: { page: currentPage, limit: itemsPerPage },
+        },
+      },
+      { query: CategoriesDocument, variables: { type: "INCOME" } },
       { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
     ],
     awaitRefetchQueries: true,
@@ -102,11 +152,13 @@ export const IncomesPage = () => {
     }
   };
 
-  const handleEdit = (income: IncomesQuery["incomes"][number]) => {
+  const handleEdit = (
+    income: PaginatedIncomesQuery["paginatedIncomes"]["items"][number],
+  ) => {
     setEditingIncome(income);
     reset({
       amount: income.amount.toString(),
-      date: new Date(income.date).toISOString().split("T")[0],
+      date: format(parseISO(income.date), "yyyy-MM-dd"),
       note: income.note || "",
       categoryId: income.categoryId,
     });
@@ -129,111 +181,116 @@ export const IncomesPage = () => {
     setEditingIncome(null);
     reset({
       amount: "",
-      date: new Date().toISOString().split("T")[0],
+      date: format(new Date(), "yyyy-MM-dd"),
       note: "",
       categoryId: "",
     });
   };
 
   const categories = categoriesData?.categories || [];
-  const incomes = incomesData?.incomes || [];
-
-  const totalIncomes = incomes.reduce((sum, inc) => sum + inc.amount, 0);
+  const incomes = incomesData?.paginatedIncomes.items || [];
+  const pageInfo = incomesData?.paginatedIncomes.pageInfo;
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-card rounded-xl shadow-sm p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Incomes</h2>
-            <p className="text-gray-600 mt-1">
-              Total:{" "}
-              <NumericFormat
-                value={totalIncomes}
-                displayType="text"
-                thousandSeparator=","
-              />
-            </p>
+            <h2 className="text-2xl font-bold text-card-foreground">
+              {t("incomes.title")}
+            </h2>
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow-md"
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition shadow-md"
           >
-            + Add Income
+            + {t("incomes.addIncome")}
           </button>
         </div>
       </div>
 
       {/* Incomes List */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">
-            Loading incomes...
+          <div className="p-8 text-center text-muted-foreground">
+            {t("incomes.loadingIncomes")}
           </div>
         ) : incomes.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No incomes yet. Add your first income!
+          <div className="p-8 text-center text-muted-foreground">
+            {t("incomes.noIncomesYet")}
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-muted border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.date")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Category
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.category")}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Note
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.note")}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.amount")}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {incomes.map((income) => (
-                  <tr key={income.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(income.date).toLocaleDateString()}
+                  <tr key={income.id} className="hover:bg-accent">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {format(parseISO(income.date), "MMM d, yyyy")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {income.category?.name}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                      {income.category.name}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-sm text-muted-foreground">
                       {income.note || "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600 text-right">
-                      <NumericFormat
-                        value={income.amount}
-                        displayType="text"
-                        thousandSeparator=","
-                      />
+                      {formatCurrency(income.amount, currency)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => handleEdit(income)}
-                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                        className="text-primary hover:text-primary/80 mr-4"
                       >
-                        Edit
+                        {t("common.edit")}
                       </button>
                       <button
                         onClick={() => handleDelete(income.id)}
                         className="text-red-600 hover:text-red-900"
                       >
-                        Delete
+                        {t("common.delete")}
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {pageInfo && (
+          <div className="px-6 pb-6">
+            <Pagination
+              currentPage={pageInfo.page}
+              totalPages={pageInfo.totalPages}
+              hasNextPage={pageInfo.hasNextPage}
+              hasPreviousPage={pageInfo.hasPreviousPage}
+              totalItems={pageInfo.total}
+              itemsPerPage={pageInfo.limit}
+              onPageChange={setCurrentPage}
+              onItemsPerPageChange={setItemsPerPage}
+            />
           </div>
         )}
       </div>
@@ -249,22 +306,12 @@ export const IncomesPage = () => {
 
           <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Amount
               </label>
               <Controller
                 name="amount"
                 control={control}
-                rules={{
-                  required: "Amount is required",
-                  validate: (value) => {
-                    const num = parseFloat(value);
-                    if (isNaN(num) || num <= 0) {
-                      return "Amount must be greater than 0";
-                    }
-                    return true;
-                  },
-                }}
                 render={({ field }) => (
                   <NumericFormat
                     value={field.value}
@@ -274,7 +321,7 @@ export const IncomesPage = () => {
                     thousandSeparator=","
                     allowNegative={false}
                     valueIsNumericString
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     placeholder="0"
                   />
                 )}
@@ -287,15 +334,13 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Date
               </label>
               <input
                 type="date"
-                {...register("date", {
-                  required: "Date is required",
-                })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("date")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
               {errors.date && (
                 <p className="mt-1 text-sm text-red-600">
@@ -305,14 +350,12 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Category
               </label>
               <select
-                {...register("categoryId", {
-                  required: "Category is required",
-                })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                {...register("categoryId")}
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
                 <option value="">Select a category</option>
                 {categories
@@ -336,12 +379,12 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Note (Optional)
               </label>
               <textarea
                 {...register("note")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 rows={3}
               />
             </div>
@@ -350,13 +393,13 @@ export const IncomesPage = () => {
               <button
                 type="button"
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                className="flex-1 px-4 py-2 border border-input text-foreground rounded-lg hover:bg-accent transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
               >
                 {editingIncome ? "Update" : "Create"}
               </button>

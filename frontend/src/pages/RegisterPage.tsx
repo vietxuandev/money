@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,45 +16,71 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+type RegisterFormData = {
+  username: string;
+  password: string;
+  confirmPassword: string;
+};
+
 export const RegisterPage = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const { t } = useTranslation();
   const [error, setError] = useState("");
   const { register, loading } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const registerSchema = z
+    .object({
+      username: z
+        .string()
+        .min(1, t("auth.errors.usernameRequired"))
+        .min(3, t("auth.errors.usernameMinLength")),
+      password: z
+        .string()
+        .min(1, t("auth.errors.passwordRequired"))
+        .min(6, t("auth.errors.passwordMinLength")),
+      confirmPassword: z
+        .string()
+        .min(1, t("auth.errors.confirmPasswordRequired")),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("auth.errors.passwordMismatch"),
+      path: ["confirmPassword"],
+    });
+
+  const {
+    register: registerField,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onSubmit = async (data: RegisterFormData) => {
     setError("");
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters");
-      return;
-    }
-
     try {
-      await register(username, password);
+      await register(data.username, data.password);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
       <Card className="max-w-md w-full shadow-lg">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-3xl font-bold">Create Account</CardTitle>
+          <CardTitle className="text-3xl font-bold">
+            {t("auth.register.title")}
+          </CardTitle>
           <CardDescription className="text-base">
-            Start managing your finances today
+            {t("auth.register.subtitle")}
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-2">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {error && (
               <div className="bg-destructive/15 text-destructive px-4 py-3 rounded-lg text-sm font-medium border border-destructive/20">
                 {error}
@@ -58,39 +88,53 @@ export const RegisterPage = () => {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t("auth.register.username")}</Label>
               <Input
                 id="username"
                 type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
                 placeholder="Choose a username"
-                required
+                {...registerField("username")}
+                aria-invalid={errors.username ? "true" : "false"}
               />
+              {errors.username && (
+                <span className="text-destructive text-sm">
+                  {errors.username.message}
+                </span>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("auth.register.password")}</Label>
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Create a password (min 6 characters)"
-                required
+                placeholder={t("auth.register.password")}
+                {...registerField("password")}
+                aria-invalid={errors.password ? "true" : "false"}
               />
+              {errors.password && (
+                <span className="text-destructive text-sm">
+                  {errors.password.message}
+                </span>
+              )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">
+                {t("auth.register.confirmPassword")}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your password"
-                required
+                placeholder={t("auth.register.confirmPassword")}
+                {...registerField("confirmPassword")}
+                aria-invalid={errors.confirmPassword ? "true" : "false"}
               />
+              {errors.confirmPassword && (
+                <span className="text-destructive text-sm">
+                  {errors.confirmPassword.message}
+                </span>
+              )}
             </div>
 
             <Button
@@ -98,17 +142,19 @@ export const RegisterPage = () => {
               disabled={loading}
               className="w-full h-11 text-base font-semibold mt-2"
             >
-              {loading ? "Creating account..." : "Sign Up"}
+              {loading
+                ? t("auth.register.submitting")
+                : t("auth.register.submit")}
             </Button>
           </form>
 
           <p className="mt-8 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            {t("auth.register.hasAccount")}{" "}
             <Link
               to="/login"
               className="text-primary hover:underline font-semibold"
             >
-              Sign in
+              {t("auth.register.signInLink")}
             </Link>
           </p>
         </CardContent>

@@ -1,0 +1,215 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "create": "Tạo",
+    "update": "Cập nhật",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "add": "Thêm",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "optional": "Tùy chọn",
+    "required": "Bắt buộc",
+    "logout": "Đăng xuất",
+    "signIn": "Đăng nhập",
+    "signUp": "Đăng ký",
+    "total": "Tổng",
+    "actions": "Thao tác",
+    "date": "Ngày",
+    "category": "Danh mục",
+    "note": "Ghi chú",
+    "amount": "Số tiền",
+    "subcategories": "danh mục con",
+    "loadingCategories": "Đang tải danh mục...",
+    "noCategoriesYet": "Chưa có danh mục nào. Thêm danh mục đầu tiên của bạn!",
+    "manageCategoryHierarchy": "Quản lý cấu trúc danh mục"
+  },
+  "nav": {
+    "dashboard": "Tổng quan",
+    "expenses": "Chi tiêu",
+    "incomes": "Thu nhập",
+    "categories": "Danh mục",
+    "financeManager": "Quản lý tài chính"
+  },
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại",
+      "subtitle": "Đăng nhập để tiếp tục",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "submit": "Đăng nhập",
+      "submitting": "Đang đăng nhập...",
+      "noAccount": "Chưa có tài khoản?",
+      "signUpLink": "Đăng ký"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "subtitle": "Bắt đầu quản lý tài chính của bạn ngay hôm nay",
+      "username": "Tên đăng nhập",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "submit": "Đăng ký",
+      "submitting": "Đang tạo tài khoản...",
+      "hasAccount": "Đã có tài khoản?",
+      "signInLink": "Đăng nhập"
+    },
+    "errors": {
+      "usernameRequired": "Tên đăng nhập là bắt buộc",
+      "usernameMinLength": "Tên đăng nhập phải có ít nhất 3 ký tự",
+      "passwordRequired": "Mật khẩu là bắt buộc",
+      "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "passwordMismatch": "Mật khẩu không khớp"
+    }
+  },
+  "dashboard": {
+    "title": "Tổng quan tài chính",
+    "totalIncome": "Tổng thu nhập",
+    "totalExpenses": "Tổng chi tiêu",
+    "balance": "Số dư",
+    "expensesByCategory": "Chi tiêu theo danh mục",
+    "incomesByCategory": "Thu nhập theo danh mục",
+    "expenseTrend": "Xu hướng chi tiêu",
+    "incomeTrend": "Xu hướng thu nhập",
+    "incomeVsExpenses": "So sánh thu nhập và chi tiêu",
+    "noData": "Không có dữ liệu",
+    "loadingStats": "Đang tải thống kê...",
+    "income": "Thu nhập",
+    "expenses": "Chi tiêu",
+    "amount": "Số tiền",
+    "timeRange": {
+      "day": "Ngày",
+      "week": "Tuần",
+      "month": "Tháng",
+      "quarter": "Quý",
+      "year": "Năm"
+    }
+  },
+  "expenses": {
+    "title": "Chi tiêu",
+    "addExpense": "Thêm chi tiêu",
+    "editExpense": "Sửa chi tiêu",
+    "totalSpent": "Tổng chi",
+    "noExpenses": "Không có chi tiêu nào",
+    "loadingExpenses": "Đang tải chi tiêu...",
+    "noExpensesYet": "Chưa có chi tiêu nào. Thêm chi tiêu đầu tiên của bạn!",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa chi tiêu này? Hành động này không thể hoàn tác.",
+    "fields": {
+      "amount": "Số tiền",
+      "date": "Ngày",
+      "category": "Danh mục",
+      "note": "Ghi chú",
+      "selectCategory": "Chọn danh mục"
+    },
+    "errors": {
+      "amountRequired": "Số tiền là bắt buộc",
+      "amountPositive": "Số tiền phải lớn hơn 0",
+      "dateRequired": "Ngày là bắt buộc",
+      "categoryRequired": "Danh mục là bắt buộc"
+    }
+  },
+  "incomes": {
+    "title": "Thu nhập",
+    "addIncome": "Thêm thu nhập",
+    "editIncome": "Sửa thu nhập",
+    "totalEarned": "Tổng thu",
+    "noIncomes": "Không có thu nhập nào",
+    "loadingIncomes": "Đang tải thu nhập...",
+    "noIncomesYet": "Chưa có thu nhập nào. Thêm thu nhập đầu tiên của bạn!",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa thu nhập này? Hành động này không thể hoàn tác.",
+    "fields": {
+      "amount": "Số tiền",
+      "date": "Ngày",
+      "category": "Danh mục",
+      "note": "Ghi chú",
+      "selectCategory": "Chọn danh mục"
+    },
+    "errors": {
+      "amountRequired": "Số tiền là bắt buộc",
+      "amountPositive": "Số tiền phải lớn hơn 0",
+      "dateRequired": "Ngày là bắt buộc",
+      "categoryRequired": "Danh mục là bắt buộc"
+    }
+  },
+  "categories": {
+    "title": "Danh mục",
+    "addCategory": "Thêm danh mục",
+    "editCategory": "Sửa danh mục",
+    "deleteCategory": "Xóa danh mục",
+    "deleteConfirm": "Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.",
+    "deleteConfirmation": "Bạn có chắc chắn muốn xóa danh mục này? Tất cả các bản ghi liên quan sẽ bị xóa. Hành động này không thể hoàn tác.",
+    "expenseCategories": "Chi tiêu",
+    "incomeCategories": "Thu nhập",
+    "noCategories": "Không có danh mục nào",
+    "categoryName": "Tên danh mục",
+    "categoryNamePlaceholder": "ví dụ: Ăn uống, Lương",
+    "type": "Loại",
+    "expense": "Chi tiêu",
+    "income": "Thu nhập",
+    "parentCategory": "Danh mục cha (Tùy chọn)",
+    "noneTopLevel": "Không có (Cấp cao nhất)",
+    "parentCategoryHint": "Chọn danh mục cha để tạo danh mục con",
+    "fields": {
+      "name": "Tên danh mục",
+      "type": "Loại",
+      "parent": "Danh mục cha",
+      "selectParent": "Chọn danh mục cha (Tùy chọn)"
+    },
+    "types": {
+      "expense": "Chi tiêu",
+      "income": "Thu nhập"
+    },
+    "errors": {
+      "nameRequired": "Tên danh mục là bắt buộc",
+      "nameMinLength": "Tên phải có ít nhất 2 ký tự",
+      "nameMaxLength": "Tên không được vượt quá 50 ký tự"
+    }
+  },
+  "pagination": {
+    "itemsPerPage": "Số mục mỗi trang",
+    "showing": "Hiển thị {{start}}-{{end}} trong tổng số {{total}} mục",
+    "page": "Trang",
+    "of": "trên",
+    "previous": "Trước",
+    "next": "Tiếp",
+    "first": "Đầu",
+    "last": "Cuối",
+    "pageOfPages": "{{current}} / {{total}}"
+  },
+  "delete": {
+    "title": "Xóa {{item}}",
+    "confirmExpense": "Bạn có chắc chắn muốn xóa chi tiêu này?",
+    "confirmIncome": "Bạn có chắc chắn muốn xóa thu nhập này?",
+    "confirmCategory": "Bạn có chắc chắn muốn xóa danh mục này?",
+    "description": "Hành động này không thể hoàn tác.",
+    "cancel": "Hủy",
+    "confirm": "Xóa"
+  },
+  "language": {
+    "english": "Tiếng Anh",
+    "vietnamese": "Tiếng Việt",
+    "switchLanguage": "Đổi ngôn ngữ"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "description": "Quản lý tùy chọn ứng dụng của bạn",
+    "theme": {
+      "title": "Giao diện",
+      "description": "Chọn chế độ màu sắc ưa thích của bạn",
+      "light": "Sáng",
+      "dark": "Tối"
+    },
+    "language": {
+      "title": "Ngôn ngữ",
+      "description": "Chọn ngôn ngữ ưa thích của bạn"
+    },
+    "currency": {
+      "title": "Đơn vị tiền tệ",
+      "description": "Chọn đơn vị tiền tệ ưa thích để hiển thị số tiền",
+      "usd": "Đô la Mỹ (USD)",
+      "vnd": "Việt Nam Đồng (VND)"
+    }
+  }
+}
