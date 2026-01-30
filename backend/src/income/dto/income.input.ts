@@ -1,11 +1,5 @@
 import { InputType, Field } from "@nestjs/graphql";
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  IsOptional,
-  IsDateString,
-} from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsOptional } from "class-validator";
 
 @InputType()
 export class CreateIncomeInput {

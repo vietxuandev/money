@@ -2,7 +2,9 @@ import { Resolver, Query, Mutation, Args } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
 import { IncomeService } from "./income.service";
 import { Income } from "./models/income.model";
+import { PaginatedIncomes } from "./models/paginated-income.model";
 import { CreateIncomeInput, UpdateIncomeInput } from "./dto/income.input";
+import { PaginationInput } from "../common/dto/pagination.input";
 import { GqlAuthGuard } from "../auth/gql-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { User as PrismaUser } from "@prisma/client";
@@ -19,6 +21,17 @@ export class IncomeResolver {
     @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
   ) {
     return this.incomeService.findAll(user.id, startDate, endDate);
+  }
+
+  @Query(() => PaginatedIncomes)
+  async paginatedIncomes(
+    @CurrentUser() user: PrismaUser,
+    @Args("pagination", { type: () => PaginationInput })
+    pagination: PaginationInput,
+    @Args("startDate", { type: () => Date, nullable: true }) startDate?: Date,
+    @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
+  ) {
+    return this.incomeService.findAll(user.id, startDate, endDate, pagination);
   }
 
   @Query(() => Income, { nullable: true })

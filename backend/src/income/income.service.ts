@@ -1,30 +1,75 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateIncomeInput, UpdateIncomeInput } from "./dto/income.input";
+import { PaginationInput } from "../common/dto/pagination.input";
+import { PageInfo } from "../common/models/pagination.model";
 
 @Injectable()
 export class IncomeService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId: string, startDate?: Date, endDate?: Date) {
-    return this.prisma.income.findMany({
-      where: {
-        userId,
-        ...(startDate &&
-          endDate && {
-            date: {
-              gte: startDate,
-              lte: endDate,
-            },
-          }),
-      },
-      include: {
-        category: true,
-      },
-      orderBy: {
-        date: "desc",
-      },
-    });
+  async findAll(
+    userId: string,
+    startDate?: Date,
+    endDate?: Date,
+    pagination?: PaginationInput,
+  ) {
+    const where = {
+      userId,
+      ...(startDate &&
+        endDate && {
+          date: {
+            gte: startDate,
+            lte: endDate,
+          },
+        }),
+    };
+
+    // If no pagination provided, return all items (backward compatibility)
+    if (!pagination) {
+      return this.prisma.income.findMany({
+        where,
+        include: {
+          category: true,
+        },
+        orderBy: {
+          date: "desc",
+        },
+      });
+    }
+
+    // Pagination logic
+    const page = pagination.page || 1;
+    const limit = pagination.limit || 10;
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      this.prisma.income.findMany({
+        where,
+        include: {
+          category: true,
+        },
+        orderBy: {
+          date: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.income.count({ where }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    const pageInfo: PageInfo = {
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    };
+
+    return { items, pageInfo };
   }
 
   async findOne(id: string, userId: string) {
@@ -54,7 +99,7 @@ export class IncomeService {
 
   async update(
     id: string,
-    userId: string,
+    _userId: string,
     updateIncomeInput: UpdateIncomeInput,
   ) {
     return this.prisma.income.update({
@@ -73,7 +118,7 @@ export class IncomeService {
     });
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: string, _userId: string) {
     return this.prisma.income.delete({
       where: {
         id,

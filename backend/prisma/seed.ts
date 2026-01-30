@@ -18,7 +18,7 @@ async function main() {
   console.log("Created user:", user);
 
   // Create expense categories
-  const foodCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Food",
       type: "EXPENSE",
@@ -37,7 +37,7 @@ async function main() {
     },
   });
 
-  const transportCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Transportation",
       type: "EXPENSE",
@@ -53,7 +53,7 @@ async function main() {
     },
   });
 
-  const billsCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Bills",
       type: "EXPENSE",
@@ -68,7 +68,7 @@ async function main() {
     },
   });
 
-  const fashionCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Fashion",
       type: "EXPENSE",
@@ -84,7 +84,7 @@ async function main() {
   });
 
   // Create income categories
-  const salaryCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Salary",
       type: "INCOME",
@@ -99,7 +99,7 @@ async function main() {
     },
   });
 
-  const investmentCategory = await prisma.category.create({
+  await prisma.category.create({
     data: {
       name: "Investment",
       type: "INCOME",

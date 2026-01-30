@@ -2,7 +2,9 @@ import { Resolver, Query, Mutation, Args } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
 import { CategoryService } from "./category.service";
 import { Category } from "./models/category.model";
+import { PaginatedCategories } from "./models/paginated-category.model";
 import { CreateCategoryInput, UpdateCategoryInput } from "./dto/category.input";
+import { PaginationInput } from "../common/dto/pagination.input";
 import { GqlAuthGuard } from "../auth/gql-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import { User, CategoryType } from "@prisma/client";
@@ -18,6 +20,16 @@ export class CategoryResolver {
     @Args("type", { type: () => String, nullable: true }) type?: CategoryType,
   ) {
     return this.categoryService.findAll(user.id, type);
+  }
+
+  @Query(() => PaginatedCategories)
+  async paginatedCategories(
+    @CurrentUser() user: User,
+    @Args("pagination", { type: () => PaginationInput })
+    pagination: PaginationInput,
+    @Args("type", { type: () => String, nullable: true }) type?: CategoryType,
+  ) {
+    return this.categoryService.findAll(user.id, type, pagination);
   }
 
   @Query(() => Category, { nullable: true })

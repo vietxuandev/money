@@ -49,6 +49,12 @@ input CreateIncomeInput {
   note: String
 }
 
+"""User preferred currency"""
+enum Currency {
+  USD
+  VND
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
@@ -93,6 +99,36 @@ type Mutation {
   updateCategory(id: String!, input: UpdateCategoryInput!): Category!
   updateExpense(id: String!, input: UpdateExpenseInput!): Expense!
   updateIncome(id: String!, input: UpdateIncomeInput!): Income!
+  updateUserSettings(input: UpdateSettingInput!): UserSetting!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  limit: Int!
+  page: Int!
+  total: Int!
+  totalPages: Int!
+}
+
+type PaginatedCategories {
+  items: [Category!]!
+  pageInfo: PageInfo!
+}
+
+type PaginatedExpenses {
+  items: [Expense!]!
+  pageInfo: PageInfo!
+}
+
+type PaginatedIncomes {
+  items: [Income!]!
+  pageInfo: PageInfo!
+}
+
+input PaginationInput {
+  limit: Int! = 10
+  page: Int! = 1
 }
 
 type Query {
@@ -103,7 +139,11 @@ type Query {
   income(id: String!): Income
   incomes(endDate: DateTime, startDate: DateTime): [Income!]!
   me: User!
+  paginatedCategories(pagination: PaginationInput!, type: String): PaginatedCategories!
+  paginatedExpenses(endDate: DateTime, pagination: PaginationInput!, startDate: DateTime): PaginatedExpenses!
+  paginatedIncomes(endDate: DateTime, pagination: PaginationInput!, startDate: DateTime): PaginatedIncomes!
   reportStatistics(range: String!, referenceDate: DateTime): ReportStatistics!
+  userSettings: UserSetting!
 }
 
 input RegisterInput {
@@ -119,6 +159,12 @@ type ReportStatistics {
   startDate: DateTime!
   totalExpense: Float!
   totalIncome: Float!
+}
+
+"""User interface theme"""
+enum Theme {
+  DARK
+  LIGHT
 }
 
 input UpdateCategoryInput {
@@ -141,8 +187,23 @@ input UpdateIncomeInput {
   note: String
 }
 
+input UpdateSettingInput {
+  currency: Currency
+  language: String
+  theme: Theme
+}
+
 type User {
   createdAt: DateTime!
   id: String!
   username: String!
+}
+
+type UserSetting {
+  currency: Currency!
+  id: String!
+  language: String!
+  theme: Theme!
+  updatedAt: DateTime!
+  userId: String!
 }
