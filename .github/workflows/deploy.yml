@@ -75,14 +75,17 @@ jobs:
                       docker pull ghcr.io/${{ github.repository_owner }}/money-backend:latest
                       docker pull ghcr.io/${{ github.repository_owner }}/money-frontend:latest
 
-                      # Stop old containers
-                      docker-compose down
+                      # Stop old containers (except database)
+                      docker-compose stop backend frontend
 
                       # Start with new images
                       docker-compose up -d
 
-                      # Run migrations
-                      docker-compose exec -T backend npm run prisma:deploy || true
+                      # Wait for backend to be ready
+                      sleep 5
+
+                      # Run database migrations
+                      docker-compose exec -T backend npx prisma migrate deploy
 
                       echo "✅ Deployment completed successfully!"
 
