@@ -50,6 +50,8 @@ jobs:
                   tags: |
                       ghcr.io/${{ github.repository_owner }}/money-frontend:latest
                       ghcr.io/${{ github.repository_owner }}/money-frontend:${{ github.sha }}
+                  build-args: |
+                      VITE_GRAPHQL_URL=${{ secrets.VITE_GRAPHQL_URL }}
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
 
@@ -60,7 +62,7 @@ jobs:
 
         steps:
             - name: Deploy to VPS
-              uses: appleboy/ssh-action@master
+              uses: appleboy/ssh-action@v0.1.10
               with:
                   host: ${{ secrets.DEPLOY_HOST }}
                   username: ${{ secrets.DEPLOY_USER }}
@@ -72,20 +74,14 @@ jobs:
                       echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
                       # Pull latest images
-                      docker pull ghcr.io/${{ github.repository_owner }}/money-backend:latest
-                      docker pull ghcr.io/${{ github.repository_owner }}/money-frontend:latest
+                      docker-compose pull backend frontend
 
-                      # Stop old containers (except database)
-                      docker-compose stop backend frontend
+                      # Restart services with new images
+                      docker-compose up -d --no-deps backend frontend
 
-                      # Start with new images
-                      docker-compose up -d
-
-                      # Wait for backend to be ready
-                      sleep 5
-
-                      # Run database migrations
-                      docker-compose exec -T backend npx prisma migrate deploy
+                      # Wait for backend to be healthy
+                      echo "Waiting for backend to be healthy..."
+                      timeout 60 sh -c 'until docker-compose exec -T backend wget --no-verbose --tries=1 --spider http://localhost:4000/graphql; do sleep 2; done'
 
                       echo "✅ Deployment completed successfully!"
 

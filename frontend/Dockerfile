@@ -5,7 +5,7 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Set build-time environment variable
-ARG VITE_GRAPHQL_URL=http://localhost:4000/graphql
+ARG VITE_GRAPHQL_URL
 ENV VITE_GRAPHQL_URL=$VITE_GRAPHQL_URL
 
 COPY package*.json ./

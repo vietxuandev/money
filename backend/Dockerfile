@@ -1,14 +1,15 @@
 # Use the official Node.js image as the base image
-FROM node:20
+FROM node:20-alpine
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
+COPY prisma ./prisma/
 
 # Install the application dependencies
-RUN npm install
+RUN npm ci --only=production
 
 # Copy the rest of the application files
 COPY . .
@@ -20,7 +21,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # Expose the application port
-EXPOSE 3000
+EXPOSE 4000
 
-# Command to run the application
-CMD ["node", "dist/src/main.js"]
+# Command to run migrations and start the application
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]
