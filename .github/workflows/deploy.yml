@@ -79,9 +79,34 @@ jobs:
                       # Restart services with new images
                       docker compose up -d --no-deps backend frontend
 
+                      # Wait for containers to start
+                      echo "Waiting for containers to start..."
+                      sleep 10
+
+                      # Show container status
+                      echo "=== Container Status ==="
+                      docker compose ps
+
+                      # Show backend logs
+                      echo "=== Backend Logs (last 100 lines) ==="
+                      docker compose logs --tail=100 backend
+
                       # Wait for backend to be healthy
-                      echo "Waiting for backend to be healthy..."
-                      timeout 60 sh -c 'until docker compose exec -T backend wget --no-verbose --tries=1 --spider http://localhost:4000/graphql; do sleep 2; done'
+                      echo "=== Checking backend health ==="
+                      for i in {1..30}; do
+                        if docker compose exec -T backend wget --no-verbose --tries=1 --spider http://localhost:4000/graphql 2>/dev/null; then
+                          echo "✅ Backend is healthy!"
+                          break
+                        fi
+                        if [ $i -eq 30 ]; then
+                          echo "❌ Backend failed to become healthy after 60 seconds"
+                          echo "=== Final Backend Logs ==="
+                          docker compose logs --tail=200 backend
+                          exit 1
+                        fi
+                        echo "Attempt $i/30: Backend not ready yet..."
+                        sleep 2
+                      done
 
                       echo "✅ Deployment completed successfully!"
 
