@@ -8,8 +8,8 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install the application dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci
 
 # Copy the rest of the application files
 COPY . .
@@ -19,6 +19,9 @@ RUN npx prisma generate
 
 # Build the NestJS application
 RUN npm run build
+
+# Remove devDependencies to reduce image size
+RUN npm prune --production
 
 # Expose the application port
 EXPOSE 4000
