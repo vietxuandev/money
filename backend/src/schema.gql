@@ -71,6 +71,17 @@ type Expense {
   userId: String!
 }
 
+enum ExpenseSortField {
+  AMOUNT
+  CREATED_AT
+  DATE
+}
+
+input ExpenseSortInput {
+  sortBy: ExpenseSortField! = DATE
+  sortDirection: SortDirection! = DESC
+}
+
 type Income {
   amount: Float!
   category: Category!
@@ -80,6 +91,17 @@ type Income {
   id: String!
   note: String
   userId: String!
+}
+
+enum IncomeSortField {
+  AMOUNT
+  CREATED_AT
+  DATE
+}
+
+input IncomeSortInput {
+  sortBy: IncomeSortField! = DATE
+  sortDirection: SortDirection! = DESC
 }
 
 input LoginInput {
@@ -135,13 +157,13 @@ type Query {
   categories(type: String): [Category!]!
   category(id: String!): Category
   expense(id: String!): Expense
-  expenses(endDate: DateTime, startDate: DateTime): [Expense!]!
+  expenses(endDate: DateTime, sort: ExpenseSortInput, startDate: DateTime): [Expense!]!
   income(id: String!): Income
-  incomes(endDate: DateTime, startDate: DateTime): [Income!]!
+  incomes(endDate: DateTime, sort: IncomeSortInput, startDate: DateTime): [Income!]!
   me: User!
   paginatedCategories(pagination: PaginationInput!, type: String): PaginatedCategories!
-  paginatedExpenses(endDate: DateTime, pagination: PaginationInput!, startDate: DateTime): PaginatedExpenses!
-  paginatedIncomes(endDate: DateTime, pagination: PaginationInput!, startDate: DateTime): PaginatedIncomes!
+  paginatedExpenses(endDate: DateTime, pagination: PaginationInput!, sort: ExpenseSortInput, startDate: DateTime): PaginatedExpenses!
+  paginatedIncomes(endDate: DateTime, pagination: PaginationInput!, sort: IncomeSortInput, startDate: DateTime): PaginatedIncomes!
   reportStatistics(range: String!, referenceDate: DateTime): ReportStatistics!
   userSettings: UserSetting!
 }
@@ -159,6 +181,11 @@ type ReportStatistics {
   startDate: DateTime!
   totalExpense: Float!
   totalIncome: Float!
+}
+
+enum SortDirection {
+  ASC
+  DESC
 }
 
 """User interface theme"""

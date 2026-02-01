@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateExpenseInput, UpdateExpenseInput } from "./dto/expense.input";
 import { PaginationInput } from "../common/dto/pagination.input";
+import { ExpenseSortInput, SortDirection } from "../common/dto/sort.input";
 import { PageInfo } from "../common/models/pagination.model";
 
 @Injectable()
@@ -13,6 +14,7 @@ export class ExpenseService {
     startDate?: Date,
     endDate?: Date,
     pagination?: PaginationInput,
+    sort?: ExpenseSortInput,
   ) {
     const where = {
       userId,
@@ -25,6 +27,10 @@ export class ExpenseService {
         }),
     };
 
+    // Determine sort field and direction
+    const sortBy = sort?.sortBy || "date";
+    const sortDirection = sort?.sortDirection || SortDirection.DESC;
+
     // If no pagination provided, return all items (backward compatibility)
     if (!pagination) {
       return this.prisma.expense.findMany({
@@ -33,7 +39,7 @@ export class ExpenseService {
           category: true,
         },
         orderBy: {
-          date: "desc",
+          [sortBy]: sortDirection,
         },
       });
     }
@@ -50,7 +56,7 @@ export class ExpenseService {
           category: true,
         },
         orderBy: {
-          date: "desc",
+          [sortBy]: sortDirection,
         },
         skip,
         take: limit,

@@ -5,6 +5,7 @@ import { Expense } from "./models/expense.model";
 import { PaginatedExpenses } from "./models/paginated-expense.model";
 import { CreateExpenseInput, UpdateExpenseInput } from "./dto/expense.input";
 import { PaginationInput } from "../common/dto/pagination.input";
+import { ExpenseSortInput } from "../common/dto/sort.input";
 import { GqlAuthGuard } from "../auth/gql-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { User as PrismaUser } from "@prisma/client";
@@ -19,8 +20,16 @@ export class ExpenseResolver {
     @CurrentUser() user: PrismaUser,
     @Args("startDate", { type: () => Date, nullable: true }) startDate?: Date,
     @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
+    @Args("sort", { type: () => ExpenseSortInput, nullable: true })
+    sort?: ExpenseSortInput,
   ) {
-    return this.expenseService.findAll(user.id, startDate, endDate);
+    return this.expenseService.findAll(
+      user.id,
+      startDate,
+      endDate,
+      undefined,
+      sort,
+    );
   }
 
   @Query(() => PaginatedExpenses)
@@ -30,8 +39,16 @@ export class ExpenseResolver {
     pagination: PaginationInput,
     @Args("startDate", { type: () => Date, nullable: true }) startDate?: Date,
     @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
+    @Args("sort", { type: () => ExpenseSortInput, nullable: true })
+    sort?: ExpenseSortInput,
   ) {
-    return this.expenseService.findAll(user.id, startDate, endDate, pagination);
+    return this.expenseService.findAll(
+      user.id,
+      startDate,
+      endDate,
+      pagination,
+      sort,
+    );
   }
 
   @Query(() => Expense, { nullable: true })

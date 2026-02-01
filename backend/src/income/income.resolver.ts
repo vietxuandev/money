@@ -5,6 +5,7 @@ import { Income } from "./models/income.model";
 import { PaginatedIncomes } from "./models/paginated-income.model";
 import { CreateIncomeInput, UpdateIncomeInput } from "./dto/income.input";
 import { PaginationInput } from "../common/dto/pagination.input";
+import { IncomeSortInput } from "../common/dto/sort.input";
 import { GqlAuthGuard } from "../auth/gql-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { User as PrismaUser } from "@prisma/client";
@@ -19,8 +20,16 @@ export class IncomeResolver {
     @CurrentUser() user: PrismaUser,
     @Args("startDate", { type: () => Date, nullable: true }) startDate?: Date,
     @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
+    @Args("sort", { type: () => IncomeSortInput, nullable: true })
+    sort?: IncomeSortInput,
   ) {
-    return this.incomeService.findAll(user.id, startDate, endDate);
+    return this.incomeService.findAll(
+      user.id,
+      startDate,
+      endDate,
+      undefined,
+      sort,
+    );
   }
 
   @Query(() => PaginatedIncomes)
@@ -30,8 +39,16 @@ export class IncomeResolver {
     pagination: PaginationInput,
     @Args("startDate", { type: () => Date, nullable: true }) startDate?: Date,
     @Args("endDate", { type: () => Date, nullable: true }) endDate?: Date,
+    @Args("sort", { type: () => IncomeSortInput, nullable: true })
+    sort?: IncomeSortInput,
   ) {
-    return this.incomeService.findAll(user.id, startDate, endDate, pagination);
+    return this.incomeService.findAll(
+      user.id,
+      startDate,
+      endDate,
+      pagination,
+      sort,
+    );
   }
 
   @Query(() => Income, { nullable: true })
