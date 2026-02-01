@@ -172,27 +172,10 @@ button {
 /* Safe area utilities for iOS notch/dynamic island */
 @layer utilities {
   .safe-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
   }
 
   .safe-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-
-  .safe-left {
-    padding-left: max(1rem, env(safe-area-inset-left));
-  }
-
-  .safe-right {
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-
-  /* For fixed/absolute positioned elements */
-  .fixed-top-safe {
-    top: env(safe-area-inset-top);
-  }
-
-  .fixed-bottom-safe {
-    bottom: env(safe-area-inset-bottom);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
