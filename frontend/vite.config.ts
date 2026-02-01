@@ -61,20 +61,6 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2}"],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.wallet\.pixelverse\.dev\/graphql$/,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "graphql-cache",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 5 * 60, // 5 minutes
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
             options: {
