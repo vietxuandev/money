@@ -40,6 +40,7 @@ export class ExpenseService {
         },
         orderBy: {
           [sortBy]: sortDirection,
+          createdAt: "desc",
         },
       });
     }
@@ -57,6 +58,7 @@ export class ExpenseService {
         },
         orderBy: {
           [sortBy]: sortDirection,
+          createdAt: "desc",
         },
         skip,
         take: limit,

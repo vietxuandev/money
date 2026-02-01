@@ -8,13 +8,11 @@ export enum SortDirection {
 export enum ExpenseSortField {
   DATE = "date",
   AMOUNT = "amount",
-  CREATED_AT = "createdAt",
 }
 
 export enum IncomeSortField {
   DATE = "date",
   AMOUNT = "amount",
-  CREATED_AT = "createdAt",
 }
 
 registerEnumType(SortDirection, {

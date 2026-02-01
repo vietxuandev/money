@@ -73,7 +73,6 @@ type Expense {
 
 enum ExpenseSortField {
   AMOUNT
-  CREATED_AT
   DATE
 }
 
@@ -95,7 +94,6 @@ type Income {
 
 enum IncomeSortField {
   AMOUNT
-  CREATED_AT
   DATE
 }
 

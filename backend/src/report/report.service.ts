@@ -48,6 +48,14 @@ export class ReportService {
   async getStatistics(userId: string, range: TimeRange, referenceDate?: Date) {
     const { startDate, endDate } = this.getDateRange(range, referenceDate);
 
+    const where = {
+      userId,
+      date: {
+        gte: startDate,
+        lte: endDate,
+      },
+    };
+
     // Get all categories for this user to lookup parent names
     const allCategories = await this.prisma.category.findMany({
       where: { userId },
@@ -60,73 +68,73 @@ export class ReportService {
 
     const categoryMap = new Map(allCategories.map((cat) => [cat.id, cat]));
 
-    // Get expenses
-    const expenses = await this.prisma.expense.findMany({
-      where: {
-        userId,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      include: {
-        category: true,
+    // Calculate expense total using database aggregation
+    const expenseAggregate = await this.prisma.expense.aggregate({
+      where,
+      _sum: {
+        amount: true,
       },
     });
 
-    // Get incomes
-    const incomes = await this.prisma.income.findMany({
-      where: {
-        userId,
-        date: {
-          gte: startDate,
-          lte: endDate,
-        },
-      },
-      include: {
-        category: true,
+    // Calculate income total using database aggregation
+    const incomeAggregate = await this.prisma.income.aggregate({
+      where,
+      _sum: {
+        amount: true,
       },
     });
 
-    // Calculate totals
-    const totalExpense = expenses.reduce(
-      (sum, expense) => sum + expense.amount,
-      0,
-    );
-    const totalIncome = incomes.reduce((sum, income) => sum + income.amount, 0);
+    const totalExpense = expenseAggregate._sum.amount || 0;
+    const totalIncome = incomeAggregate._sum.amount || 0;
     const balance = totalIncome - totalExpense;
 
-    // Group expenses by category
+    // Get expenses grouped by category with aggregation
+    const expenseGroups = await this.prisma.expense.groupBy({
+      where,
+      by: ["categoryId"],
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    // Build expense by category summary
     const expenseByCategory: CategorySummary[] = [];
-    const expenseMap = new Map<
+    const expenseCategoryMap = new Map<
       string,
       { total: number; count: number; name: string }
     >();
 
-    expenses.forEach((expense) => {
-      // Use parent category if it exists, otherwise use the category itself
-      const categoryId = expense.category.parentId || expense.categoryId;
-      const parentCategory = expense.category.parentId
-        ? categoryMap.get(expense.category.parentId)
-        : null;
-      const categoryName = parentCategory
-        ? parentCategory.name
-        : expense.category.name;
+    expenseGroups.forEach((group) => {
+      const category = categoryMap.get(group.categoryId);
+      if (!category) return;
 
-      const existing = expenseMap.get(categoryId);
+      // Use parent category if it exists
+      const categoryId = category.parentId || group.categoryId;
+      const parentCategory = category.parentId
+        ? categoryMap.get(category.parentId)
+        : null;
+      const categoryName = parentCategory ? parentCategory.name : category.name;
+
+      const existing = expenseCategoryMap.get(categoryId);
+      const total = group._sum.amount || 0;
+      const count = group._count.id;
+
       if (existing) {
-        existing.total += expense.amount;
-        existing.count += 1;
+        existing.total += total;
+        existing.count += count;
       } else {
-        expenseMap.set(categoryId, {
-          total: expense.amount,
-          count: 1,
+        expenseCategoryMap.set(categoryId, {
+          total,
+          count,
           name: categoryName,
         });
       }
     });
 
-    expenseMap.forEach((value, key) => {
+    expenseCategoryMap.forEach((value, key) => {
       expenseByCategory.push({
         categoryId: key,
         categoryName: value.name,
@@ -135,37 +143,53 @@ export class ReportService {
       });
     });
 
-    // Group incomes by category
+    // Get incomes grouped by category with aggregation
+    const incomeGroups = await this.prisma.income.groupBy({
+      where,
+      by: ["categoryId"],
+      _sum: {
+        amount: true,
+      },
+      _count: {
+        id: true,
+      },
+    });
+
+    // Build income by category summary
     const incomeByCategory: CategorySummary[] = [];
-    const incomeMap = new Map<
+    const incomeCategoryMap = new Map<
       string,
       { total: number; count: number; name: string }
     >();
 
-    incomes.forEach((income) => {
-      // Use parent category if it exists, otherwise use the category itself
-      const categoryId = income.category.parentId || income.categoryId;
-      const parentCategory = income.category.parentId
-        ? categoryMap.get(income.category.parentId)
-        : null;
-      const categoryName = parentCategory
-        ? parentCategory.name
-        : income.category.name;
+    incomeGroups.forEach((group) => {
+      const category = categoryMap.get(group.categoryId);
+      if (!category) return;
 
-      const existing = incomeMap.get(categoryId);
+      // Use parent category if it exists
+      const categoryId = category.parentId || group.categoryId;
+      const parentCategory = category.parentId
+        ? categoryMap.get(category.parentId)
+        : null;
+      const categoryName = parentCategory ? parentCategory.name : category.name;
+
+      const existing = incomeCategoryMap.get(categoryId);
+      const total = group._sum.amount || 0;
+      const count = group._count.id;
+
       if (existing) {
-        existing.total += income.amount;
-        existing.count += 1;
+        existing.total += total;
+        existing.count += count;
       } else {
-        incomeMap.set(categoryId, {
-          total: income.amount,
-          count: 1,
+        incomeCategoryMap.set(categoryId, {
+          total,
+          count,
           name: categoryName,
         });
       }
     });
 
-    incomeMap.forEach((value, key) => {
+    incomeCategoryMap.forEach((value, key) => {
       incomeByCategory.push({
         categoryId: key,
         categoryName: value.name,
