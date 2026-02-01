@@ -1,5 +1,6 @@
 import { ApolloProvider } from "@apollo/client/react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
@@ -41,6 +42,7 @@ function App() {
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
+            <PWAInstallPrompt />
           </SettingsProvider>
         </AuthProvider>
       </BrowserRouter>
