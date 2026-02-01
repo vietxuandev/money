@@ -19,18 +19,10 @@
       content="black-translucent"
     />
     <meta name="apple-mobile-web-app-title" content="My Wallet" />
-    <link rel="manifest" href="/site.webmanifest" />
     <title>My Wallet</title>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/service-worker.js").catch((err) => {
-          console.log("Service Worker registration failed:", err);
-        });
-      }
-    </script>
   </body>
 </html>
