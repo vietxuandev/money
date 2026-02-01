@@ -82,7 +82,7 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
         </nav>
 
         {/* Content */}
-        <main className="pt-14 pb-16">{children || <Outlet />}</main>
+        <main>{children || <Outlet />}</main>
       </div>
 
       {/* Bottom Navigation - Mobile Only */}
