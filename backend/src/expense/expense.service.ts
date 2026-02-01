@@ -38,10 +38,14 @@ export class ExpenseService {
         include: {
           category: true,
         },
-        orderBy: {
-          [sortBy]: sortDirection,
-          createdAt: "desc",
-        },
+        orderBy: [
+          {
+            [sortBy]: sortDirection,
+          },
+          {
+            createdAt: "desc",
+          },
+        ],
       });
     }
 
@@ -56,10 +60,14 @@ export class ExpenseService {
         include: {
           category: true,
         },
-        orderBy: {
-          [sortBy]: sortDirection,
-          createdAt: "desc",
-        },
+        orderBy: [
+          {
+            [sortBy]: sortDirection,
+          },
+          {
+            createdAt: "desc",
+          },
+        ],
         skip,
         take: limit,
       }),
