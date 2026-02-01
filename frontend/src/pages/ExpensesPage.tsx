@@ -1,22 +1,12 @@
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { useSettings } from "../hooks/useSettings";
-import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CategoryFormDialog } from "../components/CategoryFormDialog";
 import { TransactionFormDialog } from "../components/TransactionFormDialog";
+import { TransactionTable } from "../components/TransactionTable";
 import { Pagination } from "../components/Pagination";
 import { usePagination } from "../hooks/usePagination";
 import { Button } from "../components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
 import {
   usePaginatedExpensesQuery,
   useCategoriesQuery,
@@ -31,7 +21,6 @@ import {
 
 export const ExpensesPage = () => {
   const { t } = useTranslation();
-  const { currency } = useSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingExpense, setEditingExpense] = useState<
     PaginatedExpensesQuery["paginatedExpenses"]["items"][number] | null
@@ -170,73 +159,13 @@ export const ExpensesPage = () => {
 
       {/* Expenses List */}
       <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("expenses.loadingExpenses")}
-          </div>
-        ) : expenses.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("expenses.noExpensesYet")}
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.date")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.category")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.note")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.amount")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.actions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {expenses.map((expense) => (
-                <TableRow key={expense.id}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                    {format(parseISO(expense.date), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                    {expense.category.name}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-sm text-muted-foreground">
-                    {expense.note || "-"}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-rose-600 text-right">
-                    {formatCurrency(expense.amount, currency)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(expense)}
-                      className="mr-2"
-                    >
-                      {t("common.edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(expense.id)}
-                      className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                    >
-                      {t("common.delete")}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+        <TransactionTable
+          transactions={expenses}
+          loading={loading}
+          type="expense"
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
         {/* Pagination */}
         {pageInfo && (

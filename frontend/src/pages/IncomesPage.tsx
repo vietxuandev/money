@@ -1,22 +1,12 @@
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
 import { useTranslation } from "react-i18next";
-import { useSettings } from "../hooks/useSettings";
-import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CategoryFormDialog } from "../components/CategoryFormDialog";
 import { TransactionFormDialog } from "../components/TransactionFormDialog";
+import { TransactionTable } from "../components/TransactionTable";
 import { Pagination } from "../components/Pagination";
 import { usePagination } from "../hooks/usePagination";
 import { Button } from "../components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../components/ui/table";
 import {
   usePaginatedIncomesQuery,
   useCategoriesQuery,
@@ -31,7 +21,6 @@ import {
 
 export const IncomesPage = () => {
   const { t } = useTranslation();
-  const { currency } = useSettings();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingIncome, setEditingIncome] = useState<
     PaginatedIncomesQuery["paginatedIncomes"]["items"][number] | null
@@ -170,73 +159,13 @@ export const IncomesPage = () => {
 
       {/* Incomes List */}
       <div className="bg-card rounded-xl shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("incomes.loadingIncomes")}
-          </div>
-        ) : incomes.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
-            {t("incomes.noIncomesYet")}
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.date")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.category")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.note")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.amount")}
-                </TableHead>
-                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  {t("common.actions")}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {incomes.map((income) => (
-                <TableRow key={income.id}>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                    {format(parseISO(income.date), "MMM d, yyyy")}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                    {income.category.name}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 text-sm text-muted-foreground">
-                    {income.note || "-"}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-emerald-600 text-right">
-                    {formatCurrency(income.amount, currency)}
-                  </TableCell>
-                  <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleEdit(income)}
-                      className="mr-2"
-                    >
-                      {t("common.edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDelete(income.id)}
-                      className="text-red-600 hover:text-red-900 hover:bg-red-50"
-                    >
-                      {t("common.delete")}
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+        <TransactionTable
+          transactions={incomes}
+          loading={loading}
+          type="income"
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
 
         {/* Pagination */}
         {pageInfo && (
