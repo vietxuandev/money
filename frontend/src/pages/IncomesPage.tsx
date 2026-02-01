@@ -1,20 +1,14 @@
 import { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { format, parseISO } from "date-fns";
-import { NumericFormat } from "react-number-format";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "../hooks/useSettings";
 import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { CategoryFormDialog } from "../components/CategoryFormDialog";
+import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { Pagination } from "../components/Pagination";
 import { usePagination } from "../hooks/usePagination";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Textarea } from "../components/ui/textarea";
-import { DatePicker } from "../components/ui/date-picker";
 import {
   Table,
   TableBody,
@@ -23,19 +17,6 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
 import {
   usePaginatedIncomesQuery,
   useCategoriesQuery,
@@ -48,24 +29,6 @@ import {
   type PaginatedIncomesQuery,
 } from "../generated/graphql";
 
-const incomeSchema = z.object({
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine(
-      (val) => {
-        const num = parseFloat(val);
-        return !isNaN(num) && num > 0;
-      },
-      { message: "Amount must be greater than 0" },
-    ),
-  date: z.string().min(1, "Date is required"),
-  categoryId: z.string().min(1, "Category is required"),
-  note: z.string().optional(),
-});
-
-type IncomeFormData = z.infer<typeof incomeSchema>;
-
 export const IncomesPage = () => {
   const { t } = useTranslation();
   const { currency } = useSettings();
@@ -74,24 +37,9 @@ export const IncomesPage = () => {
     PaginatedIncomesQuery["paginatedIncomes"]["items"][number] | null
   >(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const { currentPage, itemsPerPage, setCurrentPage, setItemsPerPage } =
     usePagination();
-
-  const {
-    register,
-    handleSubmit: handleFormSubmit,
-    reset,
-    control,
-    formState: { errors },
-  } = useForm<IncomeFormData>({
-    resolver: zodResolver(incomeSchema),
-    defaultValues: {
-      amount: "",
-      date: format(new Date(), "yyyy-MM-dd"),
-      note: "",
-      categoryId: "",
-    },
-  });
 
   const { data: incomesData, loading } = usePaginatedIncomesQuery({
     variables: {
@@ -153,10 +101,15 @@ export const IncomesPage = () => {
     awaitRefetchQueries: true,
   });
 
-  const onSubmit = async (data: IncomeFormData) => {
+  const onSubmit = async (data: {
+    amount: string;
+    date: string;
+    categoryId: string;
+    note?: string;
+  }) => {
     const input = {
       amount: parseFloat(data.amount),
-      date: data.date, // Send as YYYY-MM-DD string
+      date: data.date,
       note: data.note || null,
       categoryId: data.categoryId,
     };
@@ -176,12 +129,6 @@ export const IncomesPage = () => {
     income: PaginatedIncomesQuery["paginatedIncomes"]["items"][number],
   ) => {
     setEditingIncome(income);
-    reset({
-      amount: income.amount.toString(),
-      date: format(parseISO(income.date), "yyyy-MM-dd"),
-      note: income.note || "",
-      categoryId: income.categoryId,
-    });
     setIsModalOpen(true);
   };
 
@@ -199,12 +146,6 @@ export const IncomesPage = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingIncome(null);
-    reset({
-      amount: "",
-      date: format(new Date(), "yyyy-MM-dd"),
-      note: "",
-      categoryId: "",
-    });
   };
 
   const categories = categoriesData?.categories || [];
@@ -314,137 +255,22 @@ export const IncomesPage = () => {
         )}
       </div>
 
-      {/* Modal */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingIncome ? t("incomes.editIncome") : t("incomes.addIncome")}
-            </DialogTitle>
-          </DialogHeader>
+      <TransactionFormDialog
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onSubmit={onSubmit}
+        editingItem={editingIncome}
+        categories={categories}
+        type="income"
+        onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
+      />
 
-          <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="amount">{t("incomes.fields.amount")}</Label>
-              <Controller
-                name="amount"
-                control={control}
-                render={({ field }) => (
-                  <NumericFormat
-                    id="amount"
-                    value={field.value}
-                    onValueChange={(values) => {
-                      field.onChange(values.value);
-                    }}
-                    thousandSeparator=","
-                    allowNegative={false}
-                    valueIsNumericString
-                    customInput={Input}
-                    placeholder="0"
-                  />
-                )}
-              />
-              {errors.amount && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.amount.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="date">{t("incomes.fields.date")}</Label>
-              <Controller
-                name="date"
-                control={control}
-                render={({ field }) => (
-                  <DatePicker
-                    value={field.value ? parseISO(field.value) : undefined}
-                    onChange={(date) => {
-                      field.onChange(date ? format(date, "yyyy-MM-dd") : "");
-                    }}
-                    placeholder={t("incomes.fields.selectDate")}
-                  />
-                )}
-              />
-              {errors.date && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.date.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="categoryId">{t("incomes.fields.category")}</Label>
-              <Controller
-                name="categoryId"
-                control={control}
-                render={({ field }) => (
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue
-                        placeholder={t("incomes.fields.selectCategory")}
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories
-                        .filter((cat) => !cat.parentId)
-                        .flatMap((cat) => [
-                          cat.children && cat.children.length > 0 ? (
-                            <SelectItem
-                              key={cat.id}
-                              value={cat.id}
-                              disabled
-                              className="font-semibold"
-                            >
-                              {cat.name}
-                            </SelectItem>
-                          ) : (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </SelectItem>
-                          ),
-                          ...(cat.children?.map((child) => (
-                            <SelectItem
-                              key={child.id}
-                              value={child.id}
-                              className="pl-6"
-                            >
-                              {child.name}
-                            </SelectItem>
-                          )) || []),
-                        ])}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              {errors.categoryId && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.categoryId.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="note">{t("incomes.fields.note")}</Label>
-              <Textarea id="note" {...register("note")} rows={3} />
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={closeModal}
-                className="flex-1"
-              >
-                {t("common.cancel")}
-              </Button>
-              <Button type="submit" className="flex-1">
-                {editingIncome ? t("common.update") : t("common.create")}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <CategoryFormDialog
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        type="INCOME"
+        categories={categories}
+      />
 
       <DeleteConfirmDialog
         isOpen={deleteConfirmId !== null}

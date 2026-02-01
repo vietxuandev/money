@@ -155,6 +155,8 @@
     "parentCategory": "Danh mục cha (Tùy chọn)",
     "noneTopLevel": "Không có (Cấp cao nhất)",
     "parentCategoryHint": "Chọn danh mục cha để tạo danh mục con",
+    "quickCreate": "Tạo nhanh",
+    "createNewCategory": "Tạo danh mục mới",
     "fields": {
       "name": "Tên danh mục",
       "type": "Loại",

@@ -155,6 +155,8 @@
     "parentCategory": "Parent Category (Optional)",
     "noneTopLevel": "None (Top Level)",
     "parentCategoryHint": "Select a parent to create a subcategory",
+    "quickCreate": "Quick Create",
+    "createNewCategory": "Create New Category",
     "fields": {
       "name": "Category Name",
       "type": "Type",

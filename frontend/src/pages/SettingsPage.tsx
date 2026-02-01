@@ -1,4 +1,3 @@
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   DollarSign,
   Moon,
@@ -9,12 +8,10 @@ import {
   User,
 } from "lucide-react";
 import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { CategoryFormDialog } from "../components/CategoryFormDialog";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
 import {
   Card,
   CardContent,
@@ -22,12 +19,6 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "../components/ui/dialog";
 import { Label } from "../components/ui/label";
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import {
@@ -42,26 +33,12 @@ import {
   CategoriesDocument,
   ReportStatisticsDocument,
   useCategoriesQuery,
-  useCreateCategoryMutation,
   useDeleteCategoryMutation,
-  useUpdateCategoryMutation,
   type CategoriesQuery,
   type CategoryType,
 } from "../generated/graphql";
 import { useAuth } from "../hooks/useAuth";
 import { useSettings } from "../hooks/useSettings";
-
-const categorySchema = z.object({
-  name: z
-    .string()
-    .min(1, "Category name is required")
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must not exceed 50 characters"),
-  type: z.enum(["EXPENSE", "INCOME"]),
-  parentId: z.string().optional(),
-});
-
-type CategoryFormData = z.infer<typeof categorySchema>;
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -79,49 +56,10 @@ const SettingsPage: React.FC = () => {
   >(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const {
-    register: registerField,
-    handleSubmit: handleCategorySubmit,
-    reset: resetForm,
-    control,
-    formState: { errors: categoryErrors },
-  } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
-    defaultValues: {
-      name: "",
-      type: "EXPENSE",
-      parentId: "",
-    },
-  });
-
   const { data: categoriesData, loading: categoriesLoading } =
     useCategoriesQuery({
       variables: { type: categoryType },
     });
-
-  const [createCategory] = useCreateCategoryMutation({
-    refetchQueries: [
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
-    },
-  });
-
-  const [updateCategory] = useUpdateCategoryMutation({
-    refetchQueries: [
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
-    },
-  });
 
   const [deleteCategory] = useDeleteCategoryMutation({
     refetchQueries: [
@@ -145,35 +83,12 @@ const SettingsPage: React.FC = () => {
   };
 
   // Category management handlers
-  const onCategorySubmit = async (data: CategoryFormData) => {
-    const input = {
-      name: data.name,
-      type: data.type,
-      parentId: data.parentId && data.parentId !== "none" ? data.parentId : null,
-    };
-
-    if (editingCategory) {
-      await updateCategory({
-        variables: { id: editingCategory.id, input },
-      });
-    } else {
-      await createCategory({
-        variables: { input },
-      });
-    }
-  };
-
   const handleEdit = (
     category:
       | CategoriesQuery["categories"][number]
       | NonNullable<CategoriesQuery["categories"][number]["children"]>[number],
   ) => {
     setEditingCategory(category);
-    resetForm({
-      name: category.name,
-      type: category.type,
-      parentId: category.parentId || "none",
-    });
     setIsModalOpen(true);
   };
 
@@ -191,11 +106,6 @@ const SettingsPage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingCategory(null);
-    resetForm({
-      name: "",
-      type: "EXPENSE",
-      parentId: "none",
-    });
   };
 
   const categories = categoriesData?.categories || [];
@@ -322,7 +232,7 @@ const SettingsPage: React.FC = () => {
               </div>
               <Button
                 onClick={() => {
-                  resetForm({ type: categoryType });
+                  setEditingCategory(null);
                   setIsModalOpen(true);
                 }}
                 size="sm"
@@ -469,111 +379,13 @@ const SettingsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Category Modal */}
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingCategory
-                ? t("categories.editCategory")
-                : t("categories.addCategory")}
-            </DialogTitle>
-          </DialogHeader>
-          <form
-            onSubmit={handleCategorySubmit(onCategorySubmit)}
-            className="space-y-4"
-          >
-            <div>
-              <Label htmlFor="name">{t("categories.categoryName")}</Label>
-              <Input
-                id="name"
-                type="text"
-                {...registerField("name")}
-                placeholder={t("categories.categoryNamePlaceholder")}
-              />
-              {categoryErrors.name && (
-                <span className="text-destructive text-sm">
-                  {categoryErrors.name.message}
-                </span>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="type">{t("categories.type")}</Label>
-              <Controller
-                name="type"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={!!editingCategory}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
-                      <SelectItem value="EXPENSE">
-                        {t("categories.expense")}
-                      </SelectItem>
-                      <SelectItem value="INCOME">
-                        {t("categories.income")}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="parentId">{t("categories.parentCategory")}</Label>
-              <Controller
-                name="parentId"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    value={field.value || "none"}
-                    onValueChange={field.onChange}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t("categories.noneTopLevel")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">
-                        {t("categories.noneTopLevel")}
-                      </SelectItem>
-                      {parentCategories
-                        .filter((cat) => cat.id !== editingCategory?.id)
-                        .map((cat) => (
-                          <SelectItem key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                {t("categories.parentCategoryHint")}
-              </p>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={closeModal}
-                className="flex-1"
-              >
-                {t("common.cancel")}
-              </Button>
-              <Button type="submit" className="flex-1">
-                {editingCategory ? t("common.update") : t("common.create")}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <CategoryFormDialog
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        type={categoryType}
+        categories={categories}
+        editingCategory={editingCategory}
+      />
 
       <DeleteConfirmDialog
         isOpen={deleteConfirmId !== null}
