@@ -31,6 +31,20 @@ export class ExpenseService {
     const sortBy = sort?.sortBy || "date";
     const sortDirection = sort?.sortDirection || SortDirection.DESC;
 
+    // Build orderBy with primary sort and createdAt as tiebreaker (if not already sorting by createdAt)
+    const orderBy: Record<string, SortDirection>[] = [
+      {
+        [sortBy]: sortDirection,
+      },
+    ];
+
+    // Only add createdAt as secondary sort if not already the primary sort field
+    if (sortBy !== "createdAt") {
+      orderBy.push({
+        createdAt: SortDirection.DESC,
+      });
+    }
+
     // If no pagination provided, return all items (backward compatibility)
     if (!pagination) {
       return this.prisma.expense.findMany({
@@ -38,14 +52,7 @@ export class ExpenseService {
         include: {
           category: true,
         },
-        orderBy: [
-          {
-            [sortBy]: sortDirection,
-          },
-          {
-            createdAt: "desc",
-          },
-        ],
+        orderBy,
       });
     }
 
@@ -60,14 +67,7 @@ export class ExpenseService {
         include: {
           category: true,
         },
-        orderBy: [
-          {
-            [sortBy]: sortDirection,
-          },
-          {
-            createdAt: "desc",
-          },
-        ],
+        orderBy,
         skip,
         take: limit,
       }),
