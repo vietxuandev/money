@@ -100,7 +100,7 @@
       "amount": "Số tiền",
       "date": "Ngày",
       "category": "Danh mục",
-      "note": "Ghi chú",
+      "note": "Ghi chú (Tùy chọn)",
       "selectCategory": "Chọn danh mục"
     },
     "errors": {
@@ -123,7 +123,7 @@
       "amount": "Số tiền",
       "date": "Ngày",
       "category": "Danh mục",
-      "note": "Ghi chú",
+      "note": "Ghi chú (Tùy chọn)",
       "selectCategory": "Chọn danh mục"
     },
     "errors": {

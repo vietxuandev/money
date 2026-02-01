@@ -319,13 +319,13 @@ export const IncomesPage = () => {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {editingIncome ? "Edit Income" : "Add New Income"}
+              {editingIncome ? t("incomes.editIncome") : t("incomes.addIncome")}
             </DialogTitle>
           </DialogHeader>
 
           <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
             <div>
-              <Label htmlFor="amount">Amount</Label>
+              <Label htmlFor="amount">{t("incomes.fields.amount")}</Label>
               <Controller
                 name="amount"
                 control={control}
@@ -352,7 +352,7 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date">{t("incomes.fields.date")}</Label>
               <Controller
                 name="date"
                 control={control}
@@ -374,7 +374,7 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <Label htmlFor="categoryId">Category</Label>
+              <Label htmlFor="categoryId">{t("incomes.fields.category")}</Label>
               <Controller
                 name="categoryId"
                 control={control}
@@ -423,7 +423,7 @@ export const IncomesPage = () => {
             </div>
 
             <div>
-              <Label htmlFor="note">Note (Optional)</Label>
+              <Label htmlFor="note">{t("incomes.fields.note")}</Label>
               <Textarea id="note" {...register("note")} rows={3} />
             </div>
 
