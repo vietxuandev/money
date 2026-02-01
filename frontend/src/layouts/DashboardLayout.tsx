@@ -87,7 +87,7 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
 
       {/* Bottom Navigation - Mobile Only */}
       <nav className="md:hidden fixed bottom-0 safe-bottom left-0 right-0 bg-card border-t border-border shadow-lg z-50">
-        <div className="flex justify-around items-center h-16 px-2">
+        <div className="flex justify-around items-center h-16 px-2 relative">
           {navLinks.map((link) => (
             <Link
               key={link.path}
