@@ -26,6 +26,15 @@
     "noCategoriesYet": "No categories yet. Add your first category!",
     "manageCategoryHierarchy": "Manage your category hierarchy"
   },
+  "validation": {
+    "amountRequired": "Amount is required",
+    "amountGreaterThanZero": "Amount must be greater than 0",
+    "dateRequired": "Date is required",
+    "categoryRequired": "Category is required",
+    "categoryNameRequired": "Category name is required",
+    "categoryNameMinLength": "Name must be at least 2 characters",
+    "categoryNameMaxLength": "Name must not exceed 50 characters"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "expenses": "Expenses",

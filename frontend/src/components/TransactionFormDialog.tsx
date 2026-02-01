@@ -5,6 +5,7 @@ import { format, parseISO } from "date-fns";
 import { NumericFormat } from "react-number-format";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
+import { createTransactionSchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -20,23 +21,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import type { CategoriesQuery } from "../generated/graphql";
 
-const transactionSchema = z.object({
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine(
-      (val) => {
-        const num = parseFloat(val);
-        return !isNaN(num) && num > 0;
-      },
-      { message: "Amount must be greater than 0" },
-    ),
-  date: z.string().min(1, "Date is required"),
-  categoryId: z.string().min(1, "Category is required"),
-  note: z.string().optional(),
-});
-
-type TransactionFormData = z.infer<typeof transactionSchema>;
+type TransactionFormData = z.infer<ReturnType<typeof createTransactionSchema>>;
 
 interface TransactionFormDialogProps {
   isOpen: boolean;
@@ -72,7 +57,7 @@ export const TransactionFormDialog = ({
     control,
     formState: { errors },
   } = useForm<TransactionFormData>({
-    resolver: zodResolver(transactionSchema),
+    resolver: zodResolver(createTransactionSchema(t)),
     defaultValues: {
       amount: "",
       date: format(new Date(), "yyyy-MM-dd"),

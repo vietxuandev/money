@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import { createCategorySchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -22,17 +23,7 @@ import {
   type CategoryType,
 } from "../generated/graphql";
 
-const categorySchema = z.object({
-  name: z
-    .string()
-    .min(1, "Category name is required")
-    .min(2, "Name must be at least 2 characters")
-    .max(50, "Name must not exceed 50 characters"),
-  type: z.enum(["EXPENSE", "INCOME"]),
-  parentId: z.string().optional(),
-});
-
-type CategoryFormData = z.infer<typeof categorySchema>;
+type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
 
 interface CategoryFormDialogProps {
   isOpen: boolean;
@@ -61,7 +52,7 @@ export const CategoryFormDialog = ({
     control,
     formState: { errors },
   } = useForm<CategoryFormData>({
-    resolver: zodResolver(categorySchema),
+    resolver: zodResolver(createCategorySchema(t)),
     defaultValues: {
       name: "",
       type: type || "EXPENSE",

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useTranslation } from "react-i18next";
+import { createRegisterSchema } from "../lib/validation";
 import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,31 +27,12 @@ export const RegisterPage = () => {
   const [error, setError] = useState("");
   const { register, loading } = useAuth();
 
-  const registerSchema = z
-    .object({
-      username: z
-        .string()
-        .min(1, t("auth.errors.usernameRequired"))
-        .min(3, t("auth.errors.usernameMinLength")),
-      password: z
-        .string()
-        .min(1, t("auth.errors.passwordRequired"))
-        .min(6, t("auth.errors.passwordMinLength")),
-      confirmPassword: z
-        .string()
-        .min(1, t("auth.errors.confirmPasswordRequired")),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t("auth.errors.passwordMismatch"),
-      path: ["confirmPassword"],
-    });
-
   const {
     register: registerField,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(t)),
     defaultValues: {
       username: "",
       password: "",

@@ -26,6 +26,15 @@
     "noCategoriesYet": "Chưa có danh mục nào. Thêm danh mục đầu tiên của bạn!",
     "manageCategoryHierarchy": "Quản lý cấu trúc danh mục"
   },
+  "validation": {
+    "amountRequired": "Số tiền là bắt buộc",
+    "amountGreaterThanZero": "Số tiền phải lớn hơn 0",
+    "dateRequired": "Ngày là bắt buộc",
+    "categoryRequired": "Danh mục là bắt buộc",
+    "categoryNameRequired": "Tên danh mục là bắt buộc",
+    "categoryNameMinLength": "Tên phải có ít nhất 2 ký tự",
+    "categoryNameMaxLength": "Tên không được vượt quá 50 ký tự"
+  },
   "nav": {
     "dashboard": "Tổng quan",
     "expenses": "Chi tiêu",
