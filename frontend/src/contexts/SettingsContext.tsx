@@ -1,12 +1,12 @@
 import React, { useState, useEffect, type ReactNode } from "react";
-import { useQuery, useMutation } from "@apollo/client";
-import { USER_SETTINGS, UPDATE_USER_SETTINGS } from "../graphql/settings";
+import { useMutation } from "@apollo/client";
+import { UPDATE_USER_SETTINGS } from "../graphql/settings";
 import {
-  type UserSettingsQuery,
   type UpdateUserSettingsMutation,
   type Theme,
   type Currency,
   type UpdateSettingInput,
+  useUserSettingsQuery,
 } from "../generated/graphql";
 import { useAuth } from "../hooks/useAuth";
 import { useTranslation } from "react-i18next";
@@ -42,7 +42,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({
   const [language, setLanguage] = useState<string>(storedSettings.language);
   const [currency, setCurrency] = useState<Currency>(storedSettings.currency);
 
-  const { data, loading } = useQuery<UserSettingsQuery>(USER_SETTINGS, {
+  const { data, loading } = useUserSettingsQuery({
     skip: !user,
     fetchPolicy: "network-only",
     onError: (error) => {

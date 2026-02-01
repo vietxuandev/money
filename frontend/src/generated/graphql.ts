@@ -85,6 +85,16 @@ export type Expense = {
   userId: Scalars['String']['output'];
 };
 
+export type ExpenseSortField =
+  | 'AMOUNT'
+  | 'CREATED_AT'
+  | 'DATE';
+
+export type ExpenseSortInput = {
+  sortBy?: ExpenseSortField;
+  sortDirection?: SortDirection;
+};
+
 export type Income = {
   __typename: 'Income';
   amount: Scalars['Float']['output'];
@@ -95,6 +105,16 @@ export type Income = {
   id: Scalars['String']['output'];
   note: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
+};
+
+export type IncomeSortField =
+  | 'AMOUNT'
+  | 'CREATED_AT'
+  | 'DATE';
+
+export type IncomeSortInput = {
+  sortBy?: IncomeSortField;
+  sortDirection?: SortDirection;
 };
 
 export type LoginInput = {
@@ -248,6 +268,7 @@ export type QueryExpenseArgs = {
 
 export type QueryExpensesArgs = {
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<ExpenseSortInput>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -259,6 +280,7 @@ export type QueryIncomeArgs = {
 
 export type QueryIncomesArgs = {
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<IncomeSortInput>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -272,6 +294,7 @@ export type QueryPaginatedCategoriesArgs = {
 export type QueryPaginatedExpensesArgs = {
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
   pagination: PaginationInput;
+  sort?: InputMaybe<ExpenseSortInput>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -279,6 +302,7 @@ export type QueryPaginatedExpensesArgs = {
 export type QueryPaginatedIncomesArgs = {
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
   pagination: PaginationInput;
+  sort?: InputMaybe<IncomeSortInput>;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -303,6 +327,10 @@ export type ReportStatistics = {
   totalExpense: Scalars['Float']['output'];
   totalIncome: Scalars['Float']['output'];
 };
+
+export type SortDirection =
+  | 'ASC'
+  | 'DESC';
 
 /** User interface theme */
 export type Theme =
@@ -418,6 +446,7 @@ export type DeleteCategoryMutation = { deleteCategory: { __typename: 'Category',
 export type ExpensesQueryVariables = Exact<{
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<ExpenseSortInput>;
 }>;
 
 
@@ -427,6 +456,7 @@ export type PaginatedExpensesQueryVariables = Exact<{
   pagination: PaginationInput;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<ExpenseSortInput>;
 }>;
 
 
@@ -464,6 +494,7 @@ export type DeleteExpenseMutation = { deleteExpense: { __typename: 'Expense', id
 export type IncomesQueryVariables = Exact<{
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<IncomeSortInput>;
 }>;
 
 
@@ -473,6 +504,7 @@ export type PaginatedIncomesQueryVariables = Exact<{
   pagination: PaginationInput;
   startDate?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  sort?: InputMaybe<IncomeSortInput>;
 }>;
 
 
@@ -929,8 +961,8 @@ export type DeleteCategoryMutationHookResult = ReturnType<typeof useDeleteCatego
 export type DeleteCategoryMutationResult = Apollo.MutationResult<DeleteCategoryMutation>;
 export type DeleteCategoryMutationOptions = Apollo.BaseMutationOptions<DeleteCategoryMutation, DeleteCategoryMutationVariables>;
 export const ExpensesDocument = gql`
-    query Expenses($startDate: DateTime, $endDate: DateTime) {
-  expenses(startDate: $startDate, endDate: $endDate) {
+    query Expenses($startDate: DateTime, $endDate: DateTime, $sort: ExpenseSortInput) {
+  expenses(startDate: $startDate, endDate: $endDate, sort: $sort) {
     id
     amount
     date
@@ -961,6 +993,7 @@ export const ExpensesDocument = gql`
  *   variables: {
  *      startDate: // value for 'startDate'
  *      endDate: // value for 'endDate'
+ *      sort: // value for 'sort'
  *   },
  * });
  */
@@ -984,11 +1017,12 @@ export type ExpensesLazyQueryHookResult = ReturnType<typeof useExpensesLazyQuery
 export type ExpensesSuspenseQueryHookResult = ReturnType<typeof useExpensesSuspenseQuery>;
 export type ExpensesQueryResult = Apollo.QueryResult<ExpensesQuery, ExpensesQueryVariables>;
 export const PaginatedExpensesDocument = gql`
-    query PaginatedExpenses($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime) {
+    query PaginatedExpenses($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime, $sort: ExpenseSortInput) {
   paginatedExpenses(
     pagination: $pagination
     startDate: $startDate
     endDate: $endDate
+    sort: $sort
   ) {
     items {
       id
@@ -1031,6 +1065,7 @@ export const PaginatedExpensesDocument = gql`
  *      pagination: // value for 'pagination'
  *      startDate: // value for 'startDate'
  *      endDate: // value for 'endDate'
+ *      sort: // value for 'sort'
  *   },
  * });
  */
@@ -1218,8 +1253,8 @@ export type DeleteExpenseMutationHookResult = ReturnType<typeof useDeleteExpense
 export type DeleteExpenseMutationResult = Apollo.MutationResult<DeleteExpenseMutation>;
 export type DeleteExpenseMutationOptions = Apollo.BaseMutationOptions<DeleteExpenseMutation, DeleteExpenseMutationVariables>;
 export const IncomesDocument = gql`
-    query Incomes($startDate: DateTime, $endDate: DateTime) {
-  incomes(startDate: $startDate, endDate: $endDate) {
+    query Incomes($startDate: DateTime, $endDate: DateTime, $sort: IncomeSortInput) {
+  incomes(startDate: $startDate, endDate: $endDate, sort: $sort) {
     id
     amount
     date
@@ -1250,6 +1285,7 @@ export const IncomesDocument = gql`
  *   variables: {
  *      startDate: // value for 'startDate'
  *      endDate: // value for 'endDate'
+ *      sort: // value for 'sort'
  *   },
  * });
  */
@@ -1273,11 +1309,12 @@ export type IncomesLazyQueryHookResult = ReturnType<typeof useIncomesLazyQuery>;
 export type IncomesSuspenseQueryHookResult = ReturnType<typeof useIncomesSuspenseQuery>;
 export type IncomesQueryResult = Apollo.QueryResult<IncomesQuery, IncomesQueryVariables>;
 export const PaginatedIncomesDocument = gql`
-    query PaginatedIncomes($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime) {
+    query PaginatedIncomes($pagination: PaginationInput!, $startDate: DateTime, $endDate: DateTime, $sort: IncomeSortInput) {
   paginatedIncomes(
     pagination: $pagination
     startDate: $startDate
     endDate: $endDate
+    sort: $sort
   ) {
     items {
       id
@@ -1320,6 +1357,7 @@ export const PaginatedIncomesDocument = gql`
  *      pagination: // value for 'pagination'
  *      startDate: // value for 'startDate'
  *      endDate: // value for 'endDate'
+ *      sort: // value for 'sort'
  *   },
  * });
  */

@@ -1,8 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const GET_INCOMES = gql`
-  query Incomes($startDate: DateTime, $endDate: DateTime) {
-    incomes(startDate: $startDate, endDate: $endDate) {
+  query Incomes(
+    $startDate: DateTime
+    $endDate: DateTime
+    $sort: IncomeSortInput
+  ) {
+    incomes(startDate: $startDate, endDate: $endDate, sort: $sort) {
       id
       amount
       date
@@ -24,11 +28,13 @@ export const GET_PAGINATED_INCOMES = gql`
     $pagination: PaginationInput!
     $startDate: DateTime
     $endDate: DateTime
+    $sort: IncomeSortInput
   ) {
     paginatedIncomes(
       pagination: $pagination
       startDate: $startDate
       endDate: $endDate
+      sort: $sort
     ) {
       items {
         id

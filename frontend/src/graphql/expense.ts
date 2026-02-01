@@ -1,8 +1,12 @@
 import { gql } from "@apollo/client";
 
 export const GET_EXPENSES = gql`
-  query Expenses($startDate: DateTime, $endDate: DateTime) {
-    expenses(startDate: $startDate, endDate: $endDate) {
+  query Expenses(
+    $startDate: DateTime
+    $endDate: DateTime
+    $sort: ExpenseSortInput
+  ) {
+    expenses(startDate: $startDate, endDate: $endDate, sort: $sort) {
       id
       amount
       date
@@ -24,11 +28,13 @@ export const GET_PAGINATED_EXPENSES = gql`
     $pagination: PaginationInput!
     $startDate: DateTime
     $endDate: DateTime
+    $sort: ExpenseSortInput
   ) {
     paginatedExpenses(
       pagination: $pagination
       startDate: $startDate
       endDate: $endDate
+      sort: $sort
     ) {
       items {
         id
