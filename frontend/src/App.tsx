@@ -1,17 +1,16 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client/react";
-import { apolloClient } from "./lib/apollo-client";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
+import { SettingsProvider } from "./contexts/SettingsContext";
+import { DashboardLayout } from "./layouts/DashboardLayout";
+import { apolloClient } from "./lib/apollo-client";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomesPage } from "./pages/IncomesPage";
-import { CategoriesPage } from "./pages/CategoriesPage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
 import SettingsPage from "./pages/SettingsPage";
-import { DashboardLayout } from "./layouts/DashboardLayout";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { SettingsProvider } from "./contexts/SettingsContext";
 
 function App() {
   return (
@@ -35,7 +34,6 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
                 <Route path="/incomes" element={<IncomesPage />} />
-                <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
 

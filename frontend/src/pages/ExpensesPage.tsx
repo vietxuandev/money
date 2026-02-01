@@ -364,7 +364,7 @@ export const ExpensesPage = () => {
                     onChange={(date) => {
                       field.onChange(date ? format(date, "yyyy-MM-dd") : "");
                     }}
-                    placeholder="Select date"
+                    placeholder={t("expenses.fields.selectDate")}
                   />
                 )}
               />
@@ -385,7 +385,9 @@ export const ExpensesPage = () => {
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue
+                        placeholder={t("expenses.fields.selectCategory")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {categories
@@ -438,10 +440,10 @@ export const ExpensesPage = () => {
                 onClick={closeModal}
                 className="flex-1"
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" className="flex-1">
-                {editingExpense ? "Update" : "Create"}
+                {editingExpense ? t("common.update") : t("common.create")}
               </Button>
             </div>
           </form>
@@ -450,8 +452,8 @@ export const ExpensesPage = () => {
 
       <DeleteConfirmDialog
         isOpen={deleteConfirmId !== null}
-        title="Delete Expense"
-        description="Are you sure you want to delete this expense? This action cannot be undone."
+        title={t("expenses.deleteExpense")}
+        description={t("expenses.deleteConfirm")}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteConfirmId(null)}
       />

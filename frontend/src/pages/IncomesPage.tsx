@@ -362,7 +362,7 @@ export const IncomesPage = () => {
                     onChange={(date) => {
                       field.onChange(date ? format(date, "yyyy-MM-dd") : "");
                     }}
-                    placeholder="Select date"
+                    placeholder={t("incomes.fields.selectDate")}
                   />
                 )}
               />
@@ -381,7 +381,9 @@ export const IncomesPage = () => {
                 render={({ field }) => (
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue
+                        placeholder={t("incomes.fields.selectCategory")}
+                      />
                     </SelectTrigger>
                     <SelectContent>
                       {categories
@@ -434,10 +436,10 @@ export const IncomesPage = () => {
                 onClick={closeModal}
                 className="flex-1"
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button type="submit" className="flex-1">
-                {editingIncome ? "Update" : "Create"}
+                {editingIncome ? t("common.update") : t("common.create")}
               </Button>
             </div>
           </form>
@@ -446,8 +448,8 @@ export const IncomesPage = () => {
 
       <DeleteConfirmDialog
         isOpen={deleteConfirmId !== null}
-        title="Delete Income"
-        description="Are you sure you want to delete this income? This action cannot be undone."
+        title={t("incomes.deleteIncome")}
+        description={t("incomes.deleteConfirm")}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteConfirmId(null)}
       />

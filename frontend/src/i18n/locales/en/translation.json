@@ -95,13 +95,15 @@
     "noExpenses": "No expenses found",
     "loadingExpenses": "Loading expenses...",
     "noExpensesYet": "No expenses yet. Add your first expense!",
+    "deleteExpense": "Delete Expense",
     "deleteConfirm": "Are you sure you want to delete this expense? This action cannot be undone.",
     "fields": {
       "amount": "Amount",
       "date": "Date",
       "category": "Category",
       "note": "Note (Optional)",
-      "selectCategory": "Select a category"
+      "selectCategory": "Select a category",
+      "selectDate": "Select date"
     },
     "errors": {
       "amountRequired": "Amount is required",
@@ -118,13 +120,15 @@
     "noIncomes": "No incomes found",
     "loadingIncomes": "Loading incomes...",
     "noIncomesYet": "No incomes yet. Add your first income!",
+    "deleteIncome": "Delete Income",
     "deleteConfirm": "Are you sure you want to delete this income? This action cannot be undone.",
     "fields": {
       "amount": "Amount",
       "date": "Date",
       "category": "Category",
       "note": "Note (Optional)",
-      "selectCategory": "Select a category"
+      "selectCategory": "Select a category",
+      "selectDate": "Select date"
     },
     "errors": {
       "amountRequired": "Amount is required",

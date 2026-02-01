@@ -95,13 +95,15 @@
     "noExpenses": "Không có chi tiêu nào",
     "loadingExpenses": "Đang tải chi tiêu...",
     "noExpensesYet": "Chưa có chi tiêu nào. Thêm chi tiêu đầu tiên của bạn!",
+    "deleteExpense": "Xóa chi tiêu",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa chi tiêu này? Hành động này không thể hoàn tác.",
     "fields": {
       "amount": "Số tiền",
       "date": "Ngày",
       "category": "Danh mục",
       "note": "Ghi chú (Tùy chọn)",
-      "selectCategory": "Chọn danh mục"
+      "selectCategory": "Chọn danh mục",
+      "selectDate": "Chọn ngày"
     },
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",
@@ -118,13 +120,15 @@
     "noIncomes": "Không có thu nhập nào",
     "loadingIncomes": "Đang tải thu nhập...",
     "noIncomesYet": "Chưa có thu nhập nào. Thêm thu nhập đầu tiên của bạn!",
+    "deleteIncome": "Xóa thu nhập",
     "deleteConfirm": "Bạn có chắc chắn muốn xóa thu nhập này? Hành động này không thể hoàn tác.",
     "fields": {
       "amount": "Số tiền",
       "date": "Ngày",
       "category": "Danh mục",
       "note": "Ghi chú (Tùy chọn)",
-      "selectCategory": "Chọn danh mục"
+      "selectCategory": "Chọn danh mục",
+      "selectDate": "Chọn ngày"
     },
     "errors": {
       "amountRequired": "Số tiền là bắt buộc",

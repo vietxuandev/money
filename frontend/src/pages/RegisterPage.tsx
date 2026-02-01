@@ -92,7 +92,7 @@ export const RegisterPage = () => {
               <Input
                 id="username"
                 type="text"
-                placeholder="Choose a username"
+                placeholder={t("auth.register.username")}
                 {...registerField("username")}
                 aria-invalid={errors.username ? "true" : "false"}
               />

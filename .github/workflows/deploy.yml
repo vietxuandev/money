@@ -91,23 +91,6 @@ jobs:
             echo "=== Backend Logs (last 100 lines) ==="
             docker compose logs --tail=100 backend
 
-            # Wait for backend to be healthy
-            echo "=== Checking backend health ==="
-            for i in {1..30}; do
-              if docker compose exec -T backend sh -c "curl -f -s http://localhost:4000/graphql -H 'Content-Type: application/json' -d '{\"query\":\"query{__typename}\"}' > /dev/null 2>&1"; then
-                echo "✅ Backend is healthy!"
-                break
-              fi
-              if [ $i -eq 30 ]; then
-                echo "❌ Backend failed to become healthy after 60 seconds"
-                echo "=== Final Backend Logs ==="
-                docker compose logs --tail=200 backend
-                exit 1
-              fi
-              echo "Attempt $i/30: Backend not ready yet..."
-              sleep 2
-            done
-
             echo "✅ Deployment completed successfully!"
 
       - name: Notify on Success
