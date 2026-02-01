@@ -6,13 +6,15 @@ import {
   Tags,
   TrendingDown,
   TrendingUp,
+  User,
 } from "lucide-react";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import {
   Card,
   CardContent,
@@ -46,6 +48,7 @@ import {
   type CategoriesQuery,
   type CategoryType,
 } from "../generated/graphql";
+import { useAuth } from "../hooks/useAuth";
 import { useSettings } from "../hooks/useSettings";
 
 const categorySchema = z.object({
@@ -62,6 +65,7 @@ type CategoryFormData = z.infer<typeof categorySchema>;
 
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const { theme, language, currency, isLoading, updateSettings } =
     useSettings();
 
@@ -79,6 +83,7 @@ const SettingsPage: React.FC = () => {
     register: registerField,
     handleSubmit: handleCategorySubmit,
     reset: resetForm,
+    control,
     formState: { errors: categoryErrors },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
@@ -144,7 +149,7 @@ const SettingsPage: React.FC = () => {
     const input = {
       name: data.name,
       type: data.type,
-      parentId: data.parentId || null,
+      parentId: data.parentId && data.parentId !== "none" ? data.parentId : null,
     };
 
     if (editingCategory) {
@@ -167,7 +172,7 @@ const SettingsPage: React.FC = () => {
     resetForm({
       name: category.name,
       type: category.type,
-      parentId: category.parentId || "",
+      parentId: category.parentId || "none",
     });
     setIsModalOpen(true);
   };
@@ -188,8 +193,8 @@ const SettingsPage: React.FC = () => {
     setEditingCategory(null);
     resetForm({
       name: "",
-      type: categoryType,
-      parentId: "",
+      type: "EXPENSE",
+      parentId: "none",
     });
   };
 
@@ -436,6 +441,34 @@ const SettingsPage: React.FC = () => {
         </Card>
       </div>
 
+      {/* Account Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("settings.account.title")}</CardTitle>
+          <CardDescription>{t("settings.account.description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+              <div className="flex flex-col gap-1">
+                <p className="font-medium">
+                  {t("settings.account.loggedInAs")}
+                </p>
+                <div className="flex items-center">
+                  <User className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    {user?.username}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Button variant="destructive" className="w-full" onClick={logout}>
+              {t("common.logout")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Category Modal */}
       <Dialog open={isModalOpen} onOpenChange={closeModal}>
         <DialogContent className="max-w-md">
@@ -446,18 +479,16 @@ const SettingsPage: React.FC = () => {
                 : t("categories.addCategory")}
             </DialogTitle>
           </DialogHeader>
-
           <form
             onSubmit={handleCategorySubmit(onCategorySubmit)}
             className="space-y-4"
           >
             <div>
               <Label htmlFor="name">{t("categories.categoryName")}</Label>
-              <input
+              <Input
                 id="name"
                 type="text"
                 {...registerField("name")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mt-1"
                 placeholder={t("categories.categoryNamePlaceholder")}
               />
               {categoryErrors.name && (
@@ -469,33 +500,59 @@ const SettingsPage: React.FC = () => {
 
             <div>
               <Label htmlFor="type">{t("categories.type")}</Label>
-              <select
-                id="type"
-                {...registerField("type")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mt-1"
-                disabled={!!editingCategory}
-              >
-                <option value="EXPENSE">{t("categories.expense")}</option>
-                <option value="INCOME">{t("categories.income")}</option>
-              </select>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={!!editingCategory}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
+                      <SelectItem value="EXPENSE">
+                        {t("categories.expense")}
+                      </SelectItem>
+                      <SelectItem value="INCOME">
+                        {t("categories.income")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </div>
 
             <div>
               <Label htmlFor="parentId">{t("categories.parentCategory")}</Label>
-              <select
-                id="parentId"
-                {...registerField("parentId")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent mt-1"
-              >
-                <option value="">{t("categories.noneTopLevel")}</option>
-                {parentCategories
-                  .filter((cat) => cat.id !== editingCategory?.id)
-                  .map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-              </select>
+              <Controller
+                name="parentId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder={t("categories.noneTopLevel")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">
+                        {t("categories.noneTopLevel")}
+                      </SelectItem>
+                      {parentCategories
+                        .filter((cat) => cat.id !== editingCategory?.id)
+                        .map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               <p className="text-xs text-muted-foreground mt-1">
                 {t("categories.parentCategoryHint")}
               </p>

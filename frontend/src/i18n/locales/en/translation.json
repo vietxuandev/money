@@ -31,7 +31,7 @@
     "expenses": "Expenses",
     "incomes": "Incomes",
     "categories": "Categories",
-    "financeManager": "Finance Manager"
+    "myWallet": "My Wallet"
   },
   "auth": {
     "login": {
@@ -210,6 +210,11 @@
       "description": "Choose your preferred currency for displaying amounts",
       "usd": "US Dollar (USD)",
       "vnd": "Vietnamese Dong (VND)"
+    },
+    "account": {
+      "title": "Account",
+      "description": "Manage your account settings",
+      "loggedInAs": "Logged in as"
     }
   }
 }

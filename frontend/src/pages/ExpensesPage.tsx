@@ -10,6 +10,26 @@ import { formatCurrency } from "../lib/currency";
 import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { Pagination } from "../components/Pagination";
 import { usePagination } from "../hooks/usePagination";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { DatePicker } from "../components/ui/date-picker";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -201,12 +221,9 @@ export const ExpensesPage = () => {
               {t("expenses.title")}
             </h2>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition shadow-md"
-          >
+          <Button onClick={() => setIsModalOpen(true)} size="default">
             + {t("expenses.addExpense")}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -221,61 +238,63 @@ export const ExpensesPage = () => {
             {t("expenses.noExpensesYet")}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted border-b border-border">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("common.date")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("common.category")}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("common.note")}
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("common.amount")}
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    {t("common.actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-card divide-y divide-border">
-                {expenses.map((expense) => (
-                  <tr key={expense.id} className="hover:bg-accent">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                      {format(parseISO(expense.date), "MMM d, yyyy")}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
-                      {expense.category.name}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-muted-foreground">
-                      {expense.note || "-"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-rose-600 text-right">
-                      {formatCurrency(expense.amount, currency)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button
-                        onClick={() => handleEdit(expense)}
-                        className="text-primary hover:text-primary/80 mr-4"
-                      >
-                        {t("common.edit")}
-                      </button>
-                      <button
-                        onClick={() => handleDelete(expense.id)}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        {t("common.delete")}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {t("common.date")}
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {t("common.category")}
+                </TableHead>
+                <TableHead className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {t("common.note")}
+                </TableHead>
+                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {t("common.amount")}
+                </TableHead>
+                <TableHead className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  {t("common.actions")}
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {expenses.map((expense) => (
+                <TableRow key={expense.id}>
+                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {format(parseISO(expense.date), "MMM d, yyyy")}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                    {expense.category.name}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 text-sm text-muted-foreground">
+                    {expense.note || "-"}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-rose-600 text-right">
+                    {formatCurrency(expense.amount, currency)}
+                  </TableCell>
+                  <TableCell className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEdit(expense)}
+                      className="mr-2"
+                    >
+                      {t("common.edit")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(expense.id)}
+                      className="text-red-600 hover:text-red-900 hover:bg-red-50"
+                    >
+                      {t("common.delete")}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         )}
 
         {/* Pagination */}
@@ -306,14 +325,13 @@ export const ExpensesPage = () => {
 
           <form onSubmit={handleFormSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Amount
-              </label>
+              <Label htmlFor="amount">Amount</Label>
               <Controller
                 name="amount"
                 control={control}
                 render={({ field }) => (
                   <NumericFormat
+                    id="amount"
                     value={field.value}
                     onValueChange={(values) => {
                       field.onChange(values.value);
@@ -321,7 +339,7 @@ export const ExpensesPage = () => {
                     thousandSeparator=","
                     allowNegative={false}
                     valueIsNumericString
-                    className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    customInput={Input}
                     placeholder="0"
                   />
                 )}
@@ -334,13 +352,19 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Date
-              </label>
-              <input
-                type="date"
-                {...register("date")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              <Label htmlFor="date">Date</Label>
+              <Controller
+                name="date"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value ? parseISO(field.value) : undefined}
+                    onChange={(date) => {
+                      field.onChange(date ? format(date, "yyyy-MM-dd") : "");
+                    }}
+                    placeholder="Select date"
+                  />
+                )}
               />
               {errors.date && (
                 <p className="mt-1 text-sm text-red-600">
@@ -350,27 +374,47 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Category
-              </label>
-              <select
-                {...register("categoryId")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              >
-                <option value="">Select a category</option>
-                {categories
-                  .filter((cat) => !cat.parentId)
-                  .map((cat) => [
-                    <option key={cat.id} value="" disabled>
-                      {cat.name}
-                    </option>,
-                    ...(cat.children?.map((child) => (
-                      <option key={child.id} value={child.id}>
-                        &nbsp;&nbsp;- {child.name}
-                      </option>
-                    )) || []),
-                  ])}
-              </select>
+              <Label htmlFor="categoryId">Category</Label>
+              <Controller
+                name="categoryId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories
+                        .filter((cat) => !cat.parentId)
+                        .flatMap((cat) => [
+                          cat.children && cat.children.length > 0 ? (
+                            <SelectItem
+                              key={cat.id}
+                              value={cat.id}
+                              disabled
+                              className="font-semibold"
+                            >
+                              {cat.name}
+                            </SelectItem>
+                          ) : (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ),
+                          ...(cat.children?.map((child) => (
+                            <SelectItem
+                              key={child.id}
+                              value={child.id}
+                              className="pl-6"
+                            >
+                              {child.name}
+                            </SelectItem>
+                          )) || []),
+                        ])}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {errors.categoryId && (
                 <p className="mt-1 text-sm text-red-600">
                   {errors.categoryId.message}
@@ -379,30 +423,22 @@ export const ExpensesPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
-                Note (Optional)
-              </label>
-              <textarea
-                {...register("note")}
-                className="w-full px-4 py-2 border border-input rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                rows={3}
-              />
+              <Label htmlFor="note">Note (Optional)</Label>
+              <Textarea id="note" {...register("note")} rows={3} />
             </div>
 
             <div className="flex gap-3 pt-4">
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={closeModal}
-                className="flex-1 px-4 py-2 border border-input text-foreground rounded-lg hover:bg-accent transition"
+                className="flex-1"
               >
                 Cancel
-              </button>
-              <button
-                type="submit"
-                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
-              >
+              </Button>
+              <Button type="submit" className="flex-1">
                 {editingExpense ? "Update" : "Create"}
-              </button>
+              </Button>
             </div>
           </form>
         </DialogContent>

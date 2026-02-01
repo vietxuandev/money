@@ -31,7 +31,7 @@
     "expenses": "Chi tiêu",
     "incomes": "Thu nhập",
     "categories": "Danh mục",
-    "financeManager": "Quản lý tài chính"
+    "myWallet": "Ví của tôi"
   },
   "auth": {
     "login": {
@@ -210,6 +210,11 @@
       "description": "Chọn đơn vị tiền tệ ưa thích để hiển thị số tiền",
       "usd": "Đô la Mỹ (USD)",
       "vnd": "Việt Nam Đồng (VND)"
+    },
+    "account": {
+      "title": "Tài khoản",
+      "description": "Quản lý cài đặt tài khoản",
+      "loggedInAs": "Đăng nhập với tên"
     }
   }
 }

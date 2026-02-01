@@ -3,14 +3,13 @@ import {
   Settings,
   TrendingDown,
   TrendingUp,
+  WalletCards,
 } from "lucide-react";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
 
 export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
-  const { user, logout } = useAuth();
   const location = useLocation();
   const { t } = useTranslation();
 
@@ -45,49 +44,15 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
 
   return (
     <div className="min-h-screen bg-background pb-20 md:pb-0">
-      {/* Header - Hide on mobile, show on desktop */}
-      <header className="bg-card shadow-sm border-b border-border hidden md:block">
+      <header className="bg-card shadow-sm border-b border-border sticky top-0 z-40 md:static md:z-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <img src="/icon.png" alt="Money Manager" className="w-8 h-8" />
-              <h1 className="text-xl font-bold text-foreground">
-                {t("nav.financeManager")}
+          <div className="flex justify-between items-center h-14 md:h-16">
+            <div className="flex items-center space-x-3 md:space-x-3">
+              <WalletCards className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+              <h1 className="text-lg md:text-xl font-bold text-foreground">
+                {t("nav.myWallet")}
               </h1>
             </div>
-
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                👤 {user?.username}
-              </span>
-              <button
-                onClick={logout}
-                className="px-4 py-2 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition"
-              >
-                {t("common.logout")}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile Header - Show only on mobile */}
-      <header className="bg-card shadow-sm border-b border-border md:hidden sticky top-0 z-40">
-        <div className="px-4">
-          <div className="flex justify-between items-center h-14">
-            <div className="flex items-center space-x-2">
-              <img src="/icon.png" alt="Money Manager" className="w-7 h-7" />
-              <h1 className="text-lg font-bold text-foreground">
-                Finance Manager
-              </h1>
-            </div>
-
-            <button
-              onClick={logout}
-              className="px-3 py-1.5 text-sm font-medium text-foreground hover:bg-accent rounded-lg transition"
-            >
-              Logout
-            </button>
           </div>
         </div>
       </header>

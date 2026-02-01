@@ -51,7 +51,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Skip caching API requests
-  if (url.pathname.startsWith("/graphql") || url.port === "4000") {
+  if (url.pathname.includes("/graphql")) {
     return;
   }
 
