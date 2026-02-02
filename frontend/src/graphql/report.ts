@@ -25,3 +25,14 @@ export const GET_REPORT_STATISTICS = gql`
     }
   }
 `;
+
+export const GET_OVERALL_TOTAL_VALUE = gql`
+  query OverallTotalValue {
+    overallTotalValue {
+      totalValue
+      totalIncome
+      totalExpense
+      totalAssets
+    }
+  }
+`;

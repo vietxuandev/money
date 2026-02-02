@@ -281,6 +281,14 @@ export type MutationUpdateUserSettingsArgs = {
   input: UpdateSettingInput;
 };
 
+export type OverallTotalValue = {
+  __typename: 'OverallTotalValue';
+  totalAssets: Scalars['Float']['output'];
+  totalExpense: Scalars['Float']['output'];
+  totalIncome: Scalars['Float']['output'];
+  totalValue: Scalars['Float']['output'];
+};
+
 export type PageInfo = {
   __typename: 'PageInfo';
   hasNextPage: Scalars['Boolean']['output'];
@@ -327,6 +335,7 @@ export type Query = {
   income: Maybe<Income>;
   incomes: Array<Income>;
   me: User;
+  overallTotalValue: OverallTotalValue;
   paginatedCategories: PaginatedCategories;
   paginatedExpenses: PaginatedExpenses;
   paginatedIncomes: PaginatedIncomes;
@@ -726,6 +735,11 @@ export type ReportStatisticsQueryVariables = Exact<{
 
 
 export type ReportStatisticsQuery = { reportStatistics: { __typename: 'ReportStatistics', totalIncome: number, totalExpense: number, balance: number, totalAssets: number, totalValue: number, startDate: string, endDate: string, expenseByCategory: Array<{ __typename: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }>, incomeByCategory: Array<{ __typename: 'CategorySummary', categoryId: string, categoryName: string, count: number, total: number }> } };
+
+export type OverallTotalValueQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type OverallTotalValueQuery = { overallTotalValue: { __typename: 'OverallTotalValue', totalValue: number, totalIncome: number, totalExpense: number, totalAssets: number } };
 
 export type UserSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2228,6 +2242,51 @@ export type ReportStatisticsQueryHookResult = ReturnType<typeof useReportStatist
 export type ReportStatisticsLazyQueryHookResult = ReturnType<typeof useReportStatisticsLazyQuery>;
 export type ReportStatisticsSuspenseQueryHookResult = ReturnType<typeof useReportStatisticsSuspenseQuery>;
 export type ReportStatisticsQueryResult = Apollo.QueryResult<ReportStatisticsQuery, ReportStatisticsQueryVariables>;
+export const OverallTotalValueDocument = gql`
+    query OverallTotalValue {
+  overallTotalValue {
+    totalValue
+    totalIncome
+    totalExpense
+    totalAssets
+  }
+}
+    `;
+
+/**
+ * __useOverallTotalValueQuery__
+ *
+ * To run a query within a React component, call `useOverallTotalValueQuery` and pass it any options that fit your needs.
+ * When your component renders, `useOverallTotalValueQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useOverallTotalValueQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useOverallTotalValueQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<OverallTotalValueQuery, OverallTotalValueQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useQuery<OverallTotalValueQuery, OverallTotalValueQueryVariables>(OverallTotalValueDocument, options);
+      }
+export function useOverallTotalValueLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<OverallTotalValueQuery, OverallTotalValueQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useLazyQuery<OverallTotalValueQuery, OverallTotalValueQueryVariables>(OverallTotalValueDocument, options);
+        }
+// @ts-ignore
+export function useOverallTotalValueSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<OverallTotalValueQuery, OverallTotalValueQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<OverallTotalValueQuery, OverallTotalValueQueryVariables>;
+export function useOverallTotalValueSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<OverallTotalValueQuery, OverallTotalValueQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<OverallTotalValueQuery | undefined, OverallTotalValueQueryVariables>;
+export function useOverallTotalValueSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<OverallTotalValueQuery, OverallTotalValueQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<OverallTotalValueQuery, OverallTotalValueQueryVariables>(OverallTotalValueDocument, options);
+        }
+export type OverallTotalValueQueryHookResult = ReturnType<typeof useOverallTotalValueQuery>;
+export type OverallTotalValueLazyQueryHookResult = ReturnType<typeof useOverallTotalValueLazyQuery>;
+export type OverallTotalValueSuspenseQueryHookResult = ReturnType<typeof useOverallTotalValueSuspenseQuery>;
+export type OverallTotalValueQueryResult = Apollo.QueryResult<OverallTotalValueQuery, OverallTotalValueQueryVariables>;
 export const UserSettingsDocument = gql`
     query UserSettings {
   userSettings {

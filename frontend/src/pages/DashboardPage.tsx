@@ -3,7 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Eye, EyeOff } from "lucide-react";
 import { useSettings } from "../hooks/useSettings";
 import { formatCurrency } from "../lib/currency";
-import { useReportStatisticsQuery } from "../generated/graphql";
+import {
+  useReportStatisticsQuery,
+  useOverallTotalValueQuery,
+} from "../generated/graphql";
 import {
   PieChart,
   Pie,
@@ -43,6 +46,7 @@ export const DashboardPage = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>("MONTH");
   const [showTotalValue, setShowTotalValue] = useState(true);
 
+  // Query for time-filtered stats (for charts and summary cards)
   const { data, loading } = useReportStatisticsQuery({
     variables: {
       range: timeRange,
@@ -52,7 +56,14 @@ export const DashboardPage = () => {
     nextFetchPolicy: "cache-first",
   });
 
+  // Separate query for all-time total value (not filtered by time range)
+  const { data: overallData } = useOverallTotalValueQuery({
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+  });
+
   const stats = data?.reportStatistics;
+  const overallTotal = overallData?.overallTotalValue;
 
   if (loading) {
     return (
@@ -84,7 +95,7 @@ export const DashboardPage = () => {
     <div className="space-y-6">
       {/* Total Value Card - Featured at Top */}
       <div
-        className={`bg-linear-to-br ${stats && stats.totalValue >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-8 text-white`}
+        className={`bg-linear-to-br ${overallTotal && overallTotal.totalValue >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-8 text-white`}
       >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -108,7 +119,10 @@ export const DashboardPage = () => {
             </div>
             <div className="text-5xl font-bold mt-2">
               {showTotalValue
-                ? formatCurrency(stats ? stats.totalValue : 0, currency)
+                ? formatCurrency(
+                    overallTotal ? overallTotal.totalValue : 0,
+                    currency,
+                  )
                 : "••••••"}
             </div>
             <div className="text-sm opacity-75 mt-2">

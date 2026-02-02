@@ -1,9 +1,10 @@
+import { format, parseISO } from "date-fns";
+import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { format, parseISO } from "date-fns";
-import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
-import { AssetTypeFormDialog } from "../components/AssetTypeFormDialog";
 import { AssetFormDialog } from "../components/AssetFormDialog";
+import { AssetTypeFormDialog } from "../components/AssetTypeFormDialog";
+import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { Button } from "../components/ui/button";
 import {
   Table,
@@ -14,19 +15,18 @@ import {
   TableRow,
 } from "../components/ui/table";
 import {
+  AssetsDocument,
+  AssetTypesDocument,
+  OverallTotalValueDocument,
   useAssetsQuery,
   useAssetTypesQuery,
   useCreateAssetMutation,
-  useUpdateAssetMutation,
   useDeleteAssetMutation,
   useDeleteAssetTypeMutation,
-  AssetsDocument,
-  AssetTypesDocument,
-  ReportStatisticsDocument,
+  useUpdateAssetMutation,
   type AssetsQuery,
   type AssetTypesQuery,
 } from "../generated/graphql";
-import { Pencil, Trash2 } from "lucide-react";
 
 export const AssetsPage = () => {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export const AssetsPage = () => {
   const [createAsset, { loading: isCreatingAsset }] = useCreateAssetMutation({
     refetchQueries: [
       { query: AssetsDocument },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      { query: OverallTotalValueDocument },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
@@ -63,7 +63,7 @@ export const AssetsPage = () => {
   const [updateAsset, { loading: isUpdatingAsset }] = useUpdateAssetMutation({
     refetchQueries: [
       { query: AssetsDocument },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      { query: OverallTotalValueDocument },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
@@ -74,7 +74,7 @@ export const AssetsPage = () => {
   const [deleteAsset, { loading: isDeletingAsset }] = useDeleteAssetMutation({
     refetchQueries: [
       { query: AssetsDocument },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      { query: OverallTotalValueDocument },
     ],
     awaitRefetchQueries: true,
   });
