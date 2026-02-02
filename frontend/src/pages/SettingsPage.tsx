@@ -40,7 +40,7 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import { useSettings } from "../hooks/useSettings";
 
-const SettingsPage: React.FC = () => {
+export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { theme, language, currency, isLoading, updateSettings } =
@@ -397,5 +397,3 @@ const SettingsPage: React.FC = () => {
     </div>
   );
 };
-
-export default SettingsPage;

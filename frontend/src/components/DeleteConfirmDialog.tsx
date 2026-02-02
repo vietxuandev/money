@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,7 @@ export const DeleteConfirmDialog = ({
   onCancel,
   isLoading = false,
 }: DeleteConfirmDialogProps) => {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleConfirm = async () => {
@@ -46,14 +48,16 @@ export const DeleteConfirmDialog = ({
         </AlertDialogHeader>
         <div className="flex gap-3 justify-end">
           <AlertDialogCancel disabled={isDeleting || isLoading}>
-            Cancel
+            {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting || isLoading}
             className="bg-destructive text-white hover:bg-destructive/90"
           >
-            {isDeleting ? "Deleting..." : "Delete"}
+            {isDeleting || isLoading
+              ? t("common.deleting")
+              : t("common.delete")}
           </AlertDialogAction>
         </div>
       </AlertDialogContent>

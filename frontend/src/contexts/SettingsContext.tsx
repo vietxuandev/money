@@ -1,15 +1,13 @@
-import React, { useState, useEffect, type ReactNode } from "react";
-import { useMutation } from "@apollo/client";
-import { UPDATE_USER_SETTINGS } from "../graphql/settings";
+import React, { useEffect, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import {
-  type UpdateUserSettingsMutation,
-  type Theme,
-  type Currency,
-  type UpdateSettingInput,
+  useUpdateUserSettingsMutation,
   useUserSettingsQuery,
+  type Currency,
+  type Theme,
+  type UpdateSettingInput,
 } from "../generated/graphql";
 import { useAuth } from "../hooks/useAuth";
-import { useTranslation } from "react-i18next";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { SettingsContext } from "./settings-context";
 
@@ -20,6 +18,7 @@ interface StoredSettings {
 }
 
 const SETTINGS_STORAGE_KEY = "userSettings";
+
 const DEFAULT_SETTINGS: StoredSettings = {
   theme: "LIGHT",
   language: "en",
@@ -51,8 +50,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({
     },
   });
 
-  const [updateSettingsMutation] =
-    useMutation<UpdateUserSettingsMutation>(UPDATE_USER_SETTINGS);
+  const [updateSettingsMutation] = useUpdateUserSettingsMutation();
 
   // Update settings when API data arrives
   useEffect(() => {

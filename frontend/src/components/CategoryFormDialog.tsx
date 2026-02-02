@@ -77,7 +77,7 @@ export const CategoryFormDialog = ({
     }
   }, [editingCategory, type, reset]);
 
-  const [createCategory] = useCreateCategoryMutation({
+  const [createCategory, { loading: isCreating }] = useCreateCategoryMutation({
     refetchQueries: [
       { query: CategoriesDocument, variables: { type: "EXPENSE" } },
       { query: CategoriesDocument, variables: { type: "INCOME" } },
@@ -88,7 +88,7 @@ export const CategoryFormDialog = ({
     },
   });
 
-  const [updateCategory] = useUpdateCategoryMutation({
+  const [updateCategory, { loading: isUpdating }] = useUpdateCategoryMutation({
     refetchQueries: [
       { query: CategoriesDocument, variables: { type: "EXPENSE" } },
       { query: CategoriesDocument, variables: { type: "INCOME" } },
@@ -218,11 +218,22 @@ export const CategoryFormDialog = ({
               variant="outline"
               onClick={handleClose}
               className="flex-1"
+              disabled={isCreating || isUpdating}
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" className="flex-1">
-              {editingCategory ? t("common.update") : t("common.create")}
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={isCreating || isUpdating}
+            >
+              {isCreating
+                ? t("common.creating")
+                : isUpdating
+                  ? t("common.updating")
+                  : editingCategory
+                    ? t("common.update")
+                    : t("common.create")}
             </Button>
           </div>
         </form>

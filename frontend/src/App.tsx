@@ -11,7 +11,7 @@ import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomesPage } from "./pages/IncomesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import SettingsPage from "./pages/SettingsPage";
+import { SettingsPage } from "./pages/SettingsPage";
 
 function App() {
   return (

@@ -36,6 +36,7 @@ interface TransactionFormDialogProps {
   categories: CategoriesQuery["categories"];
   type: "expense" | "income";
   onOpenCategoryModal: () => void;
+  isLoading?: boolean;
 }
 
 export const TransactionFormDialog = ({
@@ -46,6 +47,7 @@ export const TransactionFormDialog = ({
   categories,
   type,
   onOpenCategoryModal,
+  isLoading = false,
 }: TransactionFormDialogProps) => {
   const { t } = useTranslation();
   const translationKey = type === "expense" ? "expenses" : "incomes";
@@ -231,11 +233,18 @@ export const TransactionFormDialog = ({
               variant="outline"
               onClick={handleClose}
               className="flex-1"
+              disabled={isLoading}
             >
               {t("common.cancel")}
             </Button>
-            <Button type="submit" className="flex-1">
-              {editingItem ? t("common.update") : t("common.create")}
+            <Button type="submit" className="flex-1" disabled={isLoading}>
+              {isLoading
+                ? editingItem
+                  ? t("common.updating")
+                  : t("common.creating")
+                : editingItem
+                  ? t("common.update")
+                  : t("common.create")}
             </Button>
           </div>
         </form>
