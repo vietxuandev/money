@@ -95,7 +95,9 @@ export const DashboardPage = () => {
               <button
                 onClick={() => setShowTotalValue(!showTotalValue)}
                 className="p-1 rounded hover:bg-white/20 transition"
-                aria-label={showTotalValue ? "Hide total value" : "Show total value"}
+                aria-label={
+                  showTotalValue ? "Hide total value" : "Show total value"
+                }
               >
                 {showTotalValue ? (
                   <Eye className="h-4 w-4" />
