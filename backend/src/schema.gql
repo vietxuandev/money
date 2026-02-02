@@ -170,6 +170,13 @@ type Mutation {
   updateUserSettings(input: UpdateSettingInput!): UserSetting!
 }
 
+type OverallTotalValue {
+  totalAssets: Float!
+  totalExpense: Float!
+  totalIncome: Float!
+  totalValue: Float!
+}
+
 type PageInfo {
   hasNextPage: Boolean!
   hasPreviousPage: Boolean!
@@ -211,6 +218,7 @@ type Query {
   income(id: String!): Income
   incomes(endDate: DateTime, sort: IncomeSortInput, startDate: DateTime): [Income!]!
   me: User!
+  overallTotalValue: OverallTotalValue!
   paginatedCategories(pagination: PaginationInput!, type: String): PaginatedCategories!
   paginatedExpenses(endDate: DateTime, pagination: PaginationInput!, sort: ExpenseSortInput, startDate: DateTime): PaginatedExpenses!
   paginatedIncomes(endDate: DateTime, pagination: PaginationInput!, sort: IncomeSortInput, startDate: DateTime): PaginatedIncomes!

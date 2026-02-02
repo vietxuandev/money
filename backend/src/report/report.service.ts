@@ -1,7 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { AssetService } from "../asset/asset.service";
-import { TimeRange, CategorySummary } from "./models/report.model";
+import {
+  TimeRange,
+  CategorySummary,
+  OverallTotalValue,
+} from "./models/report.model";
 
 @Injectable()
 export class ReportService {
@@ -218,6 +222,38 @@ export class ReportService {
       expenseByCategory,
       startDate,
       endDate,
+    };
+  }
+
+  async getOverallTotalValue(userId: string): Promise<OverallTotalValue> {
+    // Calculate total income (all time)
+    const incomeAggregate = await this.prisma.income.aggregate({
+      where: { userId },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    // Calculate total expense (all time)
+    const expenseAggregate = await this.prisma.expense.aggregate({
+      where: { userId },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    // Get total asset value
+    const totalAssets = await this.assetService.getTotalAssetValue(userId);
+
+    const totalIncome = incomeAggregate._sum.amount || 0;
+    const totalExpense = expenseAggregate._sum.amount || 0;
+    const totalValue = totalIncome - totalExpense + totalAssets;
+
+    return {
+      totalValue,
+      totalIncome,
+      totalExpense,
+      totalAssets,
     };
   }
 }

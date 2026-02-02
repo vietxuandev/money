@@ -1,7 +1,11 @@
 import { Resolver, Query, Args } from "@nestjs/graphql";
 import { UseGuards } from "@nestjs/common";
 import { ReportService } from "./report.service";
-import { ReportStatistics, TimeRange } from "./models/report.model";
+import {
+  ReportStatistics,
+  TimeRange,
+  OverallTotalValue,
+} from "./models/report.model";
 import { GqlAuthGuard } from "../auth/gql-auth.guard";
 import { CurrentUser } from "../auth/current-user.decorator";
 import type { User as PrismaUser } from "@prisma/client";
@@ -19,5 +23,10 @@ export class ReportResolver {
     referenceDate?: Date,
   ) {
     return this.reportService.getStatistics(user.id, range, referenceDate);
+  }
+
+  @Query(() => OverallTotalValue)
+  async overallTotalValue(@CurrentUser() user: PrismaUser) {
+    return this.reportService.getOverallTotalValue(user.id);
   }
 }

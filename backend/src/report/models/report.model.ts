@@ -28,6 +28,21 @@ export class CategorySummary {
 }
 
 @ObjectType()
+export class OverallTotalValue {
+  @Field()
+  totalValue: number;
+
+  @Field()
+  totalIncome: number;
+
+  @Field()
+  totalExpense: number;
+
+  @Field()
+  totalAssets: number;
+}
+
+@ObjectType()
 export class ReportStatistics {
   @Field()
   totalIncome: number;
