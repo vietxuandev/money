@@ -59,3 +59,41 @@ export const createCategorySchema = (t: (key: string) => string) =>
     type: z.enum(["EXPENSE", "INCOME"]),
     parentId: z.string().optional(),
   });
+
+export const createAssetTypeSchema = (t: (key: string) => string) =>
+  z.object({
+    name: z
+      .string()
+      .min(1, t("validation.assetTypeNameRequired"))
+      .min(2, t("validation.assetTypeNameMinLength"))
+      .max(50, t("validation.assetTypeNameMaxLength")),
+    unit: z
+      .string()
+      .min(1, t("validation.unitRequired"))
+      .max(20, t("validation.unitMaxLength")),
+    description: z.string().optional(),
+  });
+
+export const createAssetSchema = (t: (key: string) => string) =>
+  z.object({
+    assetTypeId: z.string().min(1, t("validation.assetTypeRequired")),
+    name: z
+      .string()
+      .min(1, t("validation.assetNameRequired"))
+      .min(2, t("validation.assetNameMinLength"))
+      .max(100, t("validation.assetNameMaxLength")),
+    quantity: z
+      .string()
+      .min(1, t("validation.quantityRequired"))
+      .refine(
+        (val) => {
+          const num = parseFloat(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: t("validation.quantityGreaterThanZero") },
+      ),
+    purchasePrice: z.string().optional(),
+    currentSellPrice: z.string().optional(),
+    purchaseDate: z.string().min(1, t("validation.dateRequired")),
+    note: z.string().optional(),
+  });

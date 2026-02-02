@@ -6,6 +6,8 @@ export const GET_REPORT_STATISTICS = gql`
       totalIncome
       totalExpense
       balance
+      totalAssets
+      totalValue
       startDate
       endDate
       expenseByCategory {

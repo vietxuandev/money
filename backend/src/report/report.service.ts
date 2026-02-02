@@ -1,10 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
+import { AssetService } from "../asset/asset.service";
 import { TimeRange, CategorySummary } from "./models/report.model";
 
 @Injectable()
 export class ReportService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private assetService: AssetService,
+  ) {}
 
   private getDateRange(
     range: TimeRange,
@@ -87,6 +91,12 @@ export class ReportService {
     const totalExpense = expenseAggregate._sum.amount || 0;
     const totalIncome = incomeAggregate._sum.amount || 0;
     const balance = totalIncome - totalExpense;
+
+    // Get total asset value using database query
+    const totalAssets = await this.assetService.getTotalAssetValue(userId);
+
+    // Calculate total value = income + assets - expenses
+    const totalValue = totalIncome + totalAssets - totalExpense;
 
     // Get expenses grouped by category with aggregation
     const expenseGroups = await this.prisma.expense.groupBy({
@@ -202,6 +212,8 @@ export class ReportService {
       totalIncome,
       totalExpense,
       balance,
+      totalAssets,
+      totalValue,
       incomeByCategory,
       expenseByCategory,
       startDate,

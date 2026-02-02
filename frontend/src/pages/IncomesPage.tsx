@@ -42,53 +42,59 @@ export const IncomesPage = () => {
     variables: { type: "INCOME" },
   });
 
-  const [createIncome] = useCreateIncomeMutation({
-    refetchQueries: [
-      {
-        query: PaginatedIncomesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [createIncome, { loading: isCreatingIncome }] = useCreateIncomeMutation(
+    {
+      refetchQueries: [
+        {
+          query: PaginatedIncomesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
+        { query: CategoriesDocument, variables: { type: "INCOME" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+      onCompleted: () => {
+        closeModal();
       },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
     },
-  });
+  );
 
-  const [updateIncome] = useUpdateIncomeMutation({
-    refetchQueries: [
-      {
-        query: PaginatedIncomesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [updateIncome, { loading: isUpdatingIncome }] = useUpdateIncomeMutation(
+    {
+      refetchQueries: [
+        {
+          query: PaginatedIncomesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
+        { query: CategoriesDocument, variables: { type: "INCOME" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+      onCompleted: () => {
+        closeModal();
       },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
     },
-  });
+  );
 
-  const [deleteIncome] = useDeleteIncomeMutation({
-    refetchQueries: [
-      {
-        query: PaginatedIncomesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [deleteIncome, { loading: isDeletingIncome }] = useDeleteIncomeMutation(
+    {
+      refetchQueries: [
+        {
+          query: PaginatedIncomesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
-      },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-  });
+        { query: CategoriesDocument, variables: { type: "INCOME" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+    },
+  );
 
   const onSubmit = async (data: {
     amount: string;
@@ -143,22 +149,16 @@ export const IncomesPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-card rounded-xl shadow-sm p-6">
-        <div className="flex justify-between items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-card-foreground">
-              {t("incomes.title")}
-            </h2>
-          </div>
-          <Button onClick={() => setIsModalOpen(true)} size="default">
-            + {t("incomes.addIncome")}
-          </Button>
-        </div>
-      </div>
-
       {/* Incomes List */}
       <div className="bg-card rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">{t("incomes.title")}</h3>
+            <Button onClick={() => setIsModalOpen(true)} size="default">
+              + {t("incomes.addIncome")}
+            </Button>
+          </div>
+        </div>
         <TransactionTable
           transactions={incomes}
           loading={loading}
@@ -192,6 +192,7 @@ export const IncomesPage = () => {
         categories={categories}
         type="income"
         onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
+        isLoading={isCreatingIncome || isUpdatingIncome}
       />
 
       <CategoryFormDialog
@@ -207,6 +208,7 @@ export const IncomesPage = () => {
         description={t("incomes.deleteConfirm")}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteConfirmId(null)}
+        isLoading={isDeletingIncome}
       />
     </div>
   );

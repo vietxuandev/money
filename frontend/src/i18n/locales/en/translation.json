@@ -36,12 +36,24 @@
     "categoryRequired": "Category is required",
     "categoryNameRequired": "Category name is required",
     "categoryNameMinLength": "Name must be at least 2 characters",
-    "categoryNameMaxLength": "Name must not exceed 50 characters"
+    "categoryNameMaxLength": "Name must not exceed 50 characters",
+    "assetTypeRequired": "Asset type is required",
+    "assetTypeNameRequired": "Asset type name is required",
+    "assetTypeNameMinLength": "Name must be at least 2 characters",
+    "assetTypeNameMaxLength": "Name must not exceed 50 characters",
+    "assetNameRequired": "Asset name is required",
+    "assetNameMinLength": "Name must be at least 2 characters",
+    "assetNameMaxLength": "Name must not exceed 100 characters",
+    "unitRequired": "Unit is required",
+    "unitMaxLength": "Unit must not exceed 20 characters",
+    "quantityRequired": "Quantity is required",
+    "quantityGreaterThanZero": "Quantity must be greater than 0"
   },
   "nav": {
     "dashboard": "Dashboard",
     "expenses": "Expenses",
     "incomes": "Incomes",
+    "assets": "Assets",
     "categories": "Categories",
     "myWallet": "My Wallet"
   },
@@ -81,6 +93,9 @@
     "totalIncome": "Total Income",
     "totalExpenses": "Total Expenses",
     "balance": "Balance",
+    "totalAssets": "Total Assets",
+    "totalValue": "Total Value",
+    "incomeMinusExpensesPlusAssets": "Income - Expenses + Assets",
     "expensesByCategory": "Expenses by Category",
     "incomesByCategory": "Incomes by Category",
     "expenseTrend": "Expense Trend",
@@ -233,6 +248,41 @@
       "title": "Account",
       "description": "Manage your account settings",
       "loggedInAs": "Logged in as"
+    }
+  },
+  "assets": {
+    "title": "Assets",
+    "myAssets": "My Assets",
+    "assetTypes": "Asset Types",
+    "addAsset": "Add Asset",
+    "editAsset": "Edit Asset",
+    "deleteAsset": "Delete Asset",
+    "deleteAssetConfirm": "Are you sure you want to delete this asset? This action cannot be undone.",
+    "addAssetType": "Add Asset Type",
+    "editAssetType": "Edit Asset Type",
+    "deleteAssetType": "Delete Asset Type",
+    "deleteAssetTypeConfirm": "Are you sure you want to delete this asset type? All related assets will be affected. This action cannot be undone.",
+    "quickCreateType": "Quick Create",
+    "totalValue": "Total Asset Value",
+    "noAssetsYet": "No assets yet. Add your first asset!",
+    "noAssetTypesYet": "No asset types yet. Add your first asset type!",
+    "fields": {
+      "assetName": "Asset Name",
+      "assetNamePlaceholder": "e.g., Gold Ring, Apartment",
+      "assetType": "Asset Type",
+      "assetTypeName": "Type Name",
+      "assetTypeNamePlaceholder": "e.g., Gold, Real Estate",
+      "selectAssetType": "Select asset type",
+      "unit": "Unit",
+      "unitPlaceholder": "e.g., tael, usd, vnd, m2",
+      "description": "Description",
+      "quantity": "Quantity",
+      "purchasePrice": "Purchase Price (per unit)",
+      "currentSellPrice": "Current Sell Price (per unit)",
+      "purchaseDate": "Purchase Date",
+      "selectDate": "Select date",
+      "note": "Note (Optional)",
+      "totalValue": "Total Value"
     }
   }
 }

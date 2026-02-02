@@ -6,6 +6,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { apolloClient } from "./lib/apollo-client";
+import { AssetsPage } from "./pages/AssetsPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ExpensesPage } from "./pages/ExpensesPage";
 import { IncomesPage } from "./pages/IncomesPage";
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
                 <Route path="/incomes" element={<IncomesPage />} />
+                <Route path="/assets" element={<AssetsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
               </Route>
 

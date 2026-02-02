@@ -42,53 +42,56 @@ export const ExpensesPage = () => {
     variables: { type: "EXPENSE" },
   });
 
-  const [createExpense] = useCreateExpenseMutation({
-    refetchQueries: [
-      {
-        query: PaginatedExpensesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [createExpense, { loading: isCreatingExpense }] =
+    useCreateExpenseMutation({
+      refetchQueries: [
+        {
+          query: PaginatedExpensesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
+        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+      onCompleted: () => {
+        closeModal();
       },
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
-    },
-  });
+    });
 
-  const [updateExpense] = useUpdateExpenseMutation({
-    refetchQueries: [
-      {
-        query: PaginatedExpensesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [updateExpense, { loading: isUpdatingExpense }] =
+    useUpdateExpenseMutation({
+      refetchQueries: [
+        {
+          query: PaginatedExpensesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
+        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+      onCompleted: () => {
+        closeModal();
       },
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      closeModal();
-    },
-  });
+    });
 
-  const [deleteExpense] = useDeleteExpenseMutation({
-    refetchQueries: [
-      {
-        query: PaginatedExpensesDocument,
-        variables: {
-          pagination: { page: currentPage, limit: itemsPerPage },
+  const [deleteExpense, { loading: isDeletingExpense }] =
+    useDeleteExpenseMutation({
+      refetchQueries: [
+        {
+          query: PaginatedExpensesDocument,
+          variables: {
+            pagination: { page: currentPage, limit: itemsPerPage },
+          },
         },
-      },
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
-    ],
-    awaitRefetchQueries: true,
-  });
+        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
+        { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+      ],
+      awaitRefetchQueries: true,
+    });
 
   const onSubmit = async (data: {
     amount: string;
@@ -143,22 +146,16 @@ export const ExpensesPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="bg-card rounded-xl shadow-sm p-6">
-        <div className="flex justify-between items-center gap-4">
-          <div>
-            <h2 className="text-2xl font-bold text-card-foreground">
-              {t("expenses.title")}
-            </h2>
-          </div>
-          <Button onClick={() => setIsModalOpen(true)} size="default">
-            + {t("expenses.addExpense")}
-          </Button>
-        </div>
-      </div>
-
       {/* Expenses List */}
       <div className="bg-card rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">{t("expenses.title")}</h3>
+            <Button onClick={() => setIsModalOpen(true)} size="default">
+              + {t("expenses.addExpense")}
+            </Button>
+          </div>
+        </div>
         <TransactionTable
           transactions={expenses}
           loading={loading}
@@ -192,6 +189,7 @@ export const ExpensesPage = () => {
         categories={categories}
         type="expense"
         onOpenCategoryModal={() => setIsCategoryModalOpen(true)}
+        isLoading={isCreatingExpense || isUpdatingExpense}
       />
 
       <CategoryFormDialog
@@ -207,6 +205,7 @@ export const ExpensesPage = () => {
         description={t("expenses.deleteConfirm")}
         onConfirm={handleConfirmDelete}
         onCancel={() => setDeleteConfirmId(null)}
+        isLoading={isDeletingExpense}
       />
     </div>
   );

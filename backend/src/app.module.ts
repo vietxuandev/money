@@ -10,6 +10,8 @@ import { ExpenseModule } from "./expense/expense.module";
 import { IncomeModule } from "./income/income.module";
 import { ReportModule } from "./report/report.module";
 import { SettingsModule } from "./settings/settings.module";
+import { AssetTypeModule } from "./asset-type/asset-type.module";
+import { AssetModule } from "./asset/asset.module";
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { SettingsModule } from "./settings/settings.module";
     IncomeModule,
     ReportModule,
     SettingsModule,
+    AssetTypeModule,
+    AssetModule,
   ],
 })
 export class AppModule {}

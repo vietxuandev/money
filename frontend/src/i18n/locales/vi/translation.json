@@ -36,12 +36,24 @@
     "categoryRequired": "Danh mục là bắt buộc",
     "categoryNameRequired": "Tên danh mục là bắt buộc",
     "categoryNameMinLength": "Tên phải có ít nhất 2 ký tự",
-    "categoryNameMaxLength": "Tên không được vượt quá 50 ký tự"
+    "categoryNameMaxLength": "Tên không được vượt quá 50 ký tự",
+    "assetTypeRequired": "Loại tài sản là bắt buộc",
+    "assetTypeNameRequired": "Tên loại tài sản là bắt buộc",
+    "assetTypeNameMinLength": "Tên phải có ít nhất 2 ký tự",
+    "assetTypeNameMaxLength": "Tên không được vượt quá 50 ký tự",
+    "assetNameRequired": "Tên tài sản là bắt buộc",
+    "assetNameMinLength": "Tên phải có ít nhất 2 ký tự",
+    "assetNameMaxLength": "Tên không được vượt quá 100 ký tự",
+    "unitRequired": "Đơn vị là bắt buộc",
+    "unitMaxLength": "Đơn vị không được vượt quá 20 ký tự",
+    "quantityRequired": "Số lượng là bắt buộc",
+    "quantityGreaterThanZero": "Số lượng phải lớn hơn 0"
   },
   "nav": {
     "dashboard": "Tổng quan",
     "expenses": "Chi tiêu",
     "incomes": "Thu nhập",
+    "assets": "Tài sản",
     "categories": "Danh mục",
     "myWallet": "Ví của tôi"
   },
@@ -81,6 +93,9 @@
     "totalIncome": "Tổng thu nhập",
     "totalExpenses": "Tổng chi tiêu",
     "balance": "Số dư",
+    "totalAssets": "Tổng tài sản",
+    "totalValue": "Tổng giá trị",
+    "incomeMinusExpensesPlusAssets": "Thu nhập - Chi tiêu + Tài sản",
     "expensesByCategory": "Chi tiêu theo danh mục",
     "incomesByCategory": "Thu nhập theo danh mục",
     "expenseTrend": "Xu hướng chi tiêu",
@@ -233,6 +248,41 @@
       "title": "Tài khoản",
       "description": "Quản lý cài đặt tài khoản",
       "loggedInAs": "Đăng nhập với tên"
+    }
+  },
+  "assets": {
+    "title": "Tài sản",
+    "myAssets": "Tài sản của tôi",
+    "assetTypes": "Loại tài sản",
+    "addAsset": "Thêm tài sản",
+    "editAsset": "Sửa tài sản",
+    "deleteAsset": "Xóa tài sản",
+    "deleteAssetConfirm": "Bạn có chắc chắn muốn xóa tài sản này? Hành động này không thể hoàn tác.",
+    "addAssetType": "Thêm loại tài sản",
+    "editAssetType": "Sửa loại tài sản",
+    "deleteAssetType": "Xóa loại tài sản",
+    "deleteAssetTypeConfirm": "Bạn có chắc chắn muốn xóa loại tài sản này? Tất cả tài sản liên quan sẽ bị ảnh hưởng. Hành động này không thể hoàn tác.",
+    "quickCreateType": "Tạo nhanh",
+    "totalValue": "Tổng giá trị tài sản",
+    "noAssetsYet": "Chưa có tài sản nào. Thêm tài sản đầu tiên của bạn!",
+    "noAssetTypesYet": "Chưa có loại tài sản nào. Thêm loại tài sản đầu tiên của bạn!",
+    "fields": {
+      "assetName": "Tên tài sản",
+      "assetNamePlaceholder": "vd: Nhẫn vàng, Căn hộ",
+      "assetType": "Loại tài sản",
+      "assetTypeName": "Tên loại",
+      "assetTypeNamePlaceholder": "vd: Vàng, Bất động sản",
+      "selectAssetType": "Chọn loại tài sản",
+      "unit": "Đơn vị",
+      "unitPlaceholder": "vd: chỉ, usd, vnd, m2",
+      "description": "Mô tả",
+      "quantity": "Số lượng",
+      "purchasePrice": "Giá mua (mỗi đơn vị)",
+      "currentSellPrice": "Giá bán hiện tại (mỗi đơn vị)",
+      "purchaseDate": "Ngày mua",
+      "selectDate": "Chọn ngày",
+      "note": "Ghi chú (Tùy chọn)",
+      "totalValue": "Tổng giá trị"
     }
   }
 }

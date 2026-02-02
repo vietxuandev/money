@@ -1,16 +1,18 @@
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { format, parseISO } from "date-fns";
-import { NumericFormat } from "react-number-format";
-import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { NumericFormat } from "react-number-format";
+import { z } from "zod";
+import type { CategoriesQuery } from "../generated/graphql";
 import { createTransactionSchema } from "../lib/validation";
 import { Button } from "./ui/button";
+import { DatePicker } from "./ui/date-picker";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import { DatePicker } from "./ui/date-picker";
 import {
   Select,
   SelectContent,
@@ -18,8 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import type { CategoriesQuery } from "../generated/graphql";
+import { Textarea } from "./ui/textarea";
 
 type TransactionFormData = z.infer<ReturnType<typeof createTransactionSchema>>;
 
@@ -82,15 +83,23 @@ export const TransactionFormDialog = ({
     await onSubmit(data);
   };
 
-  // Update form when editingItem changes
-  if (editingItem && isOpen) {
-    reset({
-      amount: editingItem.amount.toString(),
-      date: format(parseISO(editingItem.date), "yyyy-MM-dd"),
-      note: editingItem.note || "",
-      categoryId: editingItem.categoryId,
-    });
-  }
+  useEffect(() => {
+    if (editingItem) {
+      reset({
+        amount: editingItem.amount.toString(),
+        date: format(parseISO(editingItem.date), "yyyy-MM-dd"),
+        note: editingItem.note || "",
+        categoryId: editingItem.categoryId,
+      });
+    } else {
+      reset({
+        amount: "",
+        date: format(new Date(), "yyyy-MM-dd"),
+        note: "",
+        categoryId: "",
+      });
+    }
+  }, [editingItem, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

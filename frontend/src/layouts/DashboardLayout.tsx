@@ -1,4 +1,5 @@
 import {
+  Briefcase,
   LayoutDashboard,
   Settings,
   TrendingDown,
@@ -33,6 +34,12 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
       label: t("nav.incomes"),
       icon: <TrendingUp />,
       shortLabel: t("nav.incomes"),
+    },
+    {
+      path: "/assets",
+      label: t("nav.assets"),
+      icon: <Briefcase />,
+      shortLabel: t("nav.assets"),
     },
     {
       path: "/settings",

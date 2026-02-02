@@ -20,6 +20,8 @@ model User {
   expenses   Expense[]
   incomes    Income[]
   settings   UserSetting?
+  assetTypes AssetType[]
+  assets     Asset[]
   
   @@map("users")
 }
@@ -96,4 +98,36 @@ model UserSetting {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@map("user_settings")
+}
+
+model AssetType {
+  id          String   @id @default(uuid())
+  name        String
+  unit        String   // tael, usd, vnd, m2, etc.
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assets Asset[]
+  
+  @@map("asset_types")
+}
+
+model Asset {
+  id                String    @id @default(uuid())
+  assetTypeId       String
+  name              String
+  quantity          Float
+  purchasePrice     Float     @default(1)
+  currentSellPrice  Float?
+  purchaseDate      DateTime
+  note              String?
+  userId            String
+  createdAt         DateTime  @default(now())
+  
+  assetType AssetType @relation(fields: [assetTypeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("assets")
 }

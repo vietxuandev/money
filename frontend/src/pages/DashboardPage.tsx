@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Eye, EyeOff } from "lucide-react";
 import { useSettings } from "../hooks/useSettings";
 import { formatCurrency } from "../lib/currency";
 import { useReportStatisticsQuery } from "../generated/graphql";
@@ -40,6 +41,7 @@ export const DashboardPage = () => {
   const { t } = useTranslation();
   const { currency } = useSettings();
   const [timeRange, setTimeRange] = useState<TimeRange>("MONTH");
+  const [showTotalValue, setShowTotalValue] = useState(true);
 
   const { data, loading } = useReportStatisticsQuery({
     variables: {
@@ -80,13 +82,37 @@ export const DashboardPage = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header with Time Range Selector */}
-      <div className="bg-card rounded-xl shadow-sm p-6">
+      {/* Total Value Card - Featured at Top */}
+      <div
+        className={`bg-linear-to-br ${stats && stats.totalValue >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-8 text-white`}
+      >
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <h2 className="text-2xl font-bold text-card-foreground">
-            {t("dashboard.title")}
-          </h2>
-
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-medium opacity-90">
+                {t("dashboard.totalValue")}
+              </div>
+              <button
+                onClick={() => setShowTotalValue(!showTotalValue)}
+                className="p-1 rounded hover:bg-white/20 transition"
+                aria-label={showTotalValue ? "Hide total value" : "Show total value"}
+              >
+                {showTotalValue ? (
+                  <Eye className="h-4 w-4" />
+                ) : (
+                  <EyeOff className="h-4 w-4" />
+                )}
+              </button>
+            </div>
+            <div className="text-5xl font-bold mt-2">
+              {showTotalValue
+                ? formatCurrency(stats ? stats.totalValue : 0, currency)
+                : "••••••"}
+            </div>
+            <div className="text-sm opacity-75 mt-2">
+              {t("dashboard.incomeMinusExpensesPlusAssets")}
+            </div>
+          </div>
           <div className="flex gap-2 flex-wrap">
             {(["DAY", "WEEK", "MONTH", "QUARTER", "YEAR"] as TimeRange[]).map(
               (range) => (
@@ -97,8 +123,8 @@ export const DashboardPage = () => {
                   px-4 py-2 rounded-lg text-sm font-medium transition
                   ${
                     timeRange === range
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : "bg-accent text-foreground hover:bg-accent/80"
+                      ? "bg-white/30 backdrop-blur-sm shadow-md"
+                      : "bg-white/10 backdrop-blur-sm hover:bg-white/20"
                   }
                 `}
                 >
@@ -131,7 +157,7 @@ export const DashboardPage = () => {
         </div>
 
         <div
-          className={`bg-linear-to-br ${stats && stats.balance >= 0 ? "from-violet-500 to-violet-600" : "from-amber-500 to-amber-600"} rounded-xl shadow-lg p-6 text-white`}
+          className={`bg-linear-to-br ${stats && stats.balance >= 0 ? "from-blue-500 to-blue-600" : "from-orange-500 to-orange-600"} rounded-xl shadow-lg p-6 text-white`}
         >
           <div className="text-sm font-medium opacity-90">
             {t("dashboard.balance")}

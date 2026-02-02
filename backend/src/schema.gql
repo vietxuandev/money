@@ -2,6 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Asset {
+  assetType: AssetType
+  assetTypeId: String!
+  createdAt: DateTime!
+  currentSellPrice: Float!
+  id: String!
+  name: String!
+  note: String
+  purchaseDate: DateTime!
+  purchasePrice: Float!
+  quantity: Float!
+  totalValue: Float!
+  userId: String!
+}
+
+type AssetType {
+  createdAt: DateTime!
+  description: String
+  id: String!
+  name: String!
+  unit: String!
+  userId: String!
+}
+
 type AuthPayload {
   accessToken: String!
   user: User!
@@ -27,6 +51,22 @@ type CategorySummary {
 enum CategoryType {
   EXPENSE
   INCOME
+}
+
+input CreateAssetInput {
+  assetTypeId: String!
+  currentSellPrice: Float
+  name: String!
+  note: String
+  purchaseDate: String!
+  purchasePrice: Float
+  quantity: Float!
+}
+
+input CreateAssetTypeInput {
+  description: String
+  name: String!
+  unit: String!
 }
 
 input CreateCategoryInput {
@@ -110,14 +150,20 @@ input LoginInput {
 }
 
 type Mutation {
+  createAsset(input: CreateAssetInput!): Asset!
+  createAssetType(input: CreateAssetTypeInput!): AssetType!
   createCategory(input: CreateCategoryInput!): Category!
   createExpense(input: CreateExpenseInput!): Expense!
   createIncome(input: CreateIncomeInput!): Income!
+  deleteAsset(id: String!): Asset!
+  deleteAssetType(id: String!): AssetType!
   deleteCategory(id: String!): Category!
   deleteExpense(id: String!): Expense!
   deleteIncome(id: String!): Income!
   login(input: LoginInput!): AuthPayload!
   register(input: RegisterInput!): AuthPayload!
+  updateAsset(id: String!, input: UpdateAssetInput!): Asset!
+  updateAssetType(id: String!, input: UpdateAssetTypeInput!): AssetType!
   updateCategory(id: String!, input: UpdateCategoryInput!): Category!
   updateExpense(id: String!, input: UpdateExpenseInput!): Expense!
   updateIncome(id: String!, input: UpdateIncomeInput!): Income!
@@ -154,6 +200,10 @@ input PaginationInput {
 }
 
 type Query {
+  asset(id: String!): Asset
+  assetType(id: String!): AssetType
+  assetTypes: [AssetType!]!
+  assets: [Asset!]!
   categories(type: String): [Category!]!
   category(id: String!): Category
   expense(id: String!): Expense
@@ -179,8 +229,10 @@ type ReportStatistics {
   expenseByCategory: [CategorySummary!]!
   incomeByCategory: [CategorySummary!]!
   startDate: DateTime!
+  totalAssets: Float!
   totalExpense: Float!
   totalIncome: Float!
+  totalValue: Float!
 }
 
 enum SortDirection {
@@ -192,6 +244,22 @@ enum SortDirection {
 enum Theme {
   DARK
   LIGHT
+}
+
+input UpdateAssetInput {
+  assetTypeId: String
+  currentSellPrice: Float
+  name: String
+  note: String
+  purchaseDate: String
+  purchasePrice: Float
+  quantity: Float
+}
+
+input UpdateAssetTypeInput {
+  description: String
+  name: String
+  unit: String
 }
 
 input UpdateCategoryInput {

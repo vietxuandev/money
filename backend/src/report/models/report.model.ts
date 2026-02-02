@@ -38,6 +38,12 @@ export class ReportStatistics {
   @Field()
   balance: number;
 
+  @Field()
+  totalAssets: number;
+
+  @Field()
+  totalValue: number;
+
   @Field(() => [CategorySummary])
   incomeByCategory: CategorySummary[];
 
