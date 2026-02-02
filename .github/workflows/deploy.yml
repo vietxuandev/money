@@ -76,6 +76,10 @@ jobs:
             # Pull latest images
             docker compose pull backend frontend
 
+            # Run database migrations
+            echo "=== Running Database Migrations ==="
+            docker compose run --rm backend npx prisma migrate deploy
+
             # Restart services with new images
             docker compose up -d backend frontend
 
