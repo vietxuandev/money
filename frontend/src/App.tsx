@@ -1,5 +1,6 @@
 import { ApolloProvider } from "@apollo/client/react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { registerSW } from "virtual:pwa-register";
 import { PWAHandler } from "./components/PWAHandler";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -13,6 +14,8 @@ import { IncomesPage } from "./pages/IncomesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { SettingsPage } from "./pages/SettingsPage";
+
+registerSW({ immediate: true });
 
 function App() {
   return (
