@@ -70,8 +70,8 @@ jobs:
           script: |
             cd /root/money
 
-            # Login to GHCR
-            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            # Login to GHCR (use PAT for authentication)
+            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
             # Pull latest images
             docker compose pull backend frontend
