@@ -44,7 +44,7 @@ export const DashboardPage = () => {
   const { t } = useTranslation();
   const { currency } = useSettings();
   const [timeRange, setTimeRange] = useState<TimeRange>("MONTH");
-  const [showTotalValue, setShowTotalValue] = useState(true);
+  const [showTotalValue, setShowTotalValue] = useState(false);
 
   // Query for time-filtered stats (for charts and summary cards)
   const { data, loading } = useReportStatisticsQuery({

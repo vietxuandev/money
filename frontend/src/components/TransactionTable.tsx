@@ -1,9 +1,6 @@
 import { format, parseISO } from "date-fns";
-import { enUS, vi } from "date-fns/locale";
 import { Pencil, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useSettings } from "../hooks/useSettings";
-import { formatCurrency } from "../lib/currency";
 import { Button } from "./ui/button";
 import {
   Table,
@@ -13,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { cn } from "@/lib/utils";
 
 interface TransactionTableProps<
   T extends {
@@ -45,12 +43,7 @@ export const TransactionTable = <
   onEdit,
   onDelete,
 }: TransactionTableProps<T>) => {
-  const { t, i18n } = useTranslation();
-  const { currency } = useSettings();
-  const locale = i18n.language === "vi" ? vi : enUS;
-
-  const amountColorClass =
-    type === "expense" ? "text-rose-600" : "text-emerald-600";
+  const { t } = useTranslation();
 
   return (
     <Table>
@@ -82,16 +75,19 @@ export const TransactionTable = <
           transactions.map((transaction) => (
             <TableRow key={transaction.id}>
               <TableCell>
-                {format(parseISO(transaction.date), "dd/MM/yyyy", { locale })}
+                {format(parseISO(transaction.date), "dd/MM/yyyy")}
               </TableCell>
               <TableCell>{transaction.category.name}</TableCell>
               <TableCell className="text-muted-foreground">
                 {transaction.note || "-"}
               </TableCell>
               <TableCell
-                className={`font-semibold ${amountColorClass} text-right`}
+                className={cn(
+                  `font-semibold text-right`,
+                  type === "expense" ? "text-rose-600" : "text-emerald-600",
+                )}
               >
-                {formatCurrency(transaction.amount, currency)}
+                {transaction.amount.toLocaleString()}
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex gap-2 justify-end">

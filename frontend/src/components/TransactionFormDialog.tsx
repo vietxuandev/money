@@ -136,6 +136,7 @@ export const TransactionFormDialog = ({
                   valueIsNumericString
                   customInput={Input}
                   placeholder="0"
+                  inputMode="numeric"
                 />
               )}
             />

@@ -186,7 +186,8 @@ export const AssetFormDialog = ({
                   allowNegative={false}
                   valueIsNumericString
                   customInput={Input}
-                  placeholder="0"
+                  placeholder="1"
+                  inputMode="numeric"
                 />
               )}
             />
@@ -215,7 +216,8 @@ export const AssetFormDialog = ({
                   allowNegative={false}
                   valueIsNumericString
                   customInput={Input}
-                  placeholder="1"
+                  placeholder="0"
+                  inputMode="numeric"
                 />
               )}
             />
@@ -245,6 +247,7 @@ export const AssetFormDialog = ({
                   valueIsNumericString
                   customInput={Input}
                   placeholder="0"
+                  inputMode="numeric"
                 />
               )}
             />
