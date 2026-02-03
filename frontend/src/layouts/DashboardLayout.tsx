@@ -50,8 +50,8 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="bg-card shadow-sm border-b border-border fixed md:sticky top-0 safe-top z-40 left-0 right-0 md:z-auto">
+    <div className="min-h-dvh pt-safe pb-safe px-safe bg-background pb-20 md:pb-0">
+      <header className="bg-card shadow-sm border-b border-border fixed md:sticky top-0 pt-safe z-40 left-0 right-0 md:z-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 md:h-16">
             <div className="flex items-center space-x-3 md:space-x-3">
@@ -93,7 +93,7 @@ export const DashboardLayout = ({ children }: { children?: ReactNode }) => {
       </div>
 
       {/* Bottom Navigation - Mobile Only */}
-      <nav className="md:hidden fixed bottom-0 safe-bottom left-0 right-0 bg-card border-t border-border shadow-lg z-50">
+      <nav className="md:hidden fixed bottom-0 pb-safe left-0 right-0 bg-card border-t border-border shadow-lg z-50">
         <div className="flex justify-around items-center h-16 px-2 relative">
           {navLinks.map((link) => (
             <Link
