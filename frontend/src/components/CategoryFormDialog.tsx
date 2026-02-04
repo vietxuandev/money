@@ -60,23 +60,6 @@ export const CategoryFormDialog = ({
     },
   });
 
-  // Update form when editingCategory changes
-  useEffect(() => {
-    if (editingCategory) {
-      reset({
-        name: editingCategory.name,
-        type: editingCategory.type,
-        parentId: editingCategory.parentId || "none",
-      });
-    } else if (type) {
-      reset({
-        name: "",
-        type,
-        parentId: "none",
-      });
-    }
-  }, [editingCategory, type, reset]);
-
   const [createCategory, { loading: isCreating }] = useCreateCategoryMutation({
     refetchQueries: [
       { query: CategoriesDocument, variables: { type: "EXPENSE" } },
@@ -128,6 +111,23 @@ export const CategoryFormDialog = ({
   };
 
   const parentCategories = categories.filter((cat) => !cat.parentId);
+
+  // Update form when editingCategory changes
+  useEffect(() => {
+    if (editingCategory) {
+      reset({
+        name: editingCategory.name,
+        type: editingCategory.type,
+        parentId: editingCategory.parentId || "none",
+      });
+    } else {
+      reset({
+        name: "",
+        type: type || "EXPENSE",
+        parentId: "none",
+      });
+    }
+  }, [editingCategory, type, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
