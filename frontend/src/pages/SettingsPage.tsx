@@ -43,8 +43,7 @@ import { useSettings } from "../hooks/useSettings";
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
-  const { theme, language, currency, isLoading, updateSettings } =
-    useSettings();
+  const { theme, language, currency, updateSettings } = useSettings();
 
   // Category management state
   const [categoryType, setCategoryType] = useState<CategoryType>("EXPENSE");
@@ -110,14 +109,6 @@ export const SettingsPage: React.FC = () => {
 
   const categories = categoriesData?.categories || [];
   const parentCategories = categories.filter((cat) => !cat.parentId);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-muted-foreground">{t("common.loading")}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

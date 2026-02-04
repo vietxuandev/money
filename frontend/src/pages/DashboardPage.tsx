@@ -1,23 +1,24 @@
+import { Skeleton } from "@/components/ui/skeleton";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Eye, EyeOff } from "lucide-react";
-import { useSettings } from "../hooks/useSettings";
-import { formatCurrency } from "../lib/currency";
 import {
-  useReportStatisticsQuery,
-  useOverallTotalValueQuery,
-} from "../generated/graphql";
-import {
-  PieChart,
-  Pie,
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
+import {
+  useOverallTotalValueQuery,
+  useReportStatisticsQuery,
+} from "../generated/graphql";
+import { useSettings } from "../hooks/useSettings";
+import { formatCurrency } from "../lib/currency";
 
 type TimeRange = "DAY" | "WEEK" | "MONTH" | "QUARTER" | "YEAR";
 
@@ -57,23 +58,14 @@ export const DashboardPage = () => {
   });
 
   // Separate query for all-time total value (not filtered by time range)
-  const { data: overallData } = useOverallTotalValueQuery({
-    fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-first",
-  });
+  const { data: overallData, loading: overallLoading } =
+    useOverallTotalValueQuery({
+      fetchPolicy: "cache-first",
+      nextFetchPolicy: "cache-first",
+    });
 
   const stats = data?.reportStatistics;
   const overallTotal = overallData?.overallTotalValue;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-muted-foreground">
-          {t("dashboard.loadingStats")}
-        </div>
-      </div>
-    );
-  }
 
   const expenseData = stats
     ? stats.expenseByCategory.map((item) => ({
@@ -118,12 +110,18 @@ export const DashboardPage = () => {
               </button>
             </div>
             <div className="text-5xl font-bold mt-2">
-              {showTotalValue
-                ? formatCurrency(
+              {showTotalValue ? (
+                overallLoading ? (
+                  <Skeleton className="h-12 w-48" />
+                ) : (
+                  formatCurrency(
                     overallTotal ? overallTotal.totalValue : 0,
                     currency,
                   )
-                : "••••••"}
+                )
+              ) : (
+                "••••••"
+              )}
             </div>
             <div className="text-sm opacity-75 mt-2">
               {t("dashboard.incomeMinusExpensesPlusAssets")}
@@ -159,7 +157,11 @@ export const DashboardPage = () => {
             {t("dashboard.totalIncome")}
           </div>
           <div className="text-3xl font-bold mt-2">
-            {formatCurrency(stats ? stats.totalIncome : 0, currency)}
+            {loading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              formatCurrency(stats ? stats.totalIncome : 0, currency)
+            )}
           </div>
         </div>
 
@@ -168,7 +170,11 @@ export const DashboardPage = () => {
             {t("dashboard.totalExpenses")}
           </div>
           <div className="text-3xl font-bold mt-2">
-            {formatCurrency(stats ? stats.totalExpense : 0, currency)}
+            {loading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              formatCurrency(stats ? stats.totalExpense : 0, currency)
+            )}
           </div>
         </div>
 
@@ -179,7 +185,11 @@ export const DashboardPage = () => {
             {t("dashboard.balance")}
           </div>
           <div className="text-3xl font-bold mt-2">
-            {formatCurrency(stats ? stats.balance : 0, currency)}
+            {loading ? (
+              <Skeleton className="h-8 w-24" />
+            ) : (
+              formatCurrency(stats ? stats.balance : 0, currency)
+            )}
           </div>
         </div>
       </div>
