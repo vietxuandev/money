@@ -3,6 +3,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enable fast taps on all interactive elements */
+button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
 /* Safe area utilities for iOS notch/dynamic island */
 @layer utilities {
   .pt-safe {
