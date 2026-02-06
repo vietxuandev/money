@@ -1,7 +1,10 @@
 import { createContext } from "react";
-import type { Theme, Currency, UpdateSettingInput } from "../generated/graphql";
-
-export interface SettingsContextType {
+import {
+  type Currency,
+  type Theme,
+  type UpdateSettingInput,
+} from "../generated/graphql";
+interface SettingsContextType {
   theme: Theme;
   language: string;
   currency: Currency;

@@ -11,8 +11,8 @@ import { createAssetSchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { DatePicker } from "./ui/date-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Field, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
@@ -92,16 +92,6 @@ export const AssetFormDialog = ({
         purchaseDate: format(parseISO(editingItem.purchaseDate), "yyyy-MM-dd"),
         note: editingItem.note || "",
       });
-    } else {
-      reset({
-        assetTypeId: "",
-        name: "",
-        quantity: "",
-        purchasePrice: "",
-        currentSellPrice: "",
-        purchaseDate: format(new Date(), "yyyy-MM-dd"),
-        note: "",
-      });
     }
   }, [editingItem, reset]);
 
@@ -115,11 +105,11 @@ export const AssetFormDialog = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <div>
+          <Field>
             <div className="flex items-center justify-between">
-              <Label htmlFor="assetTypeId">
+              <FieldLabel htmlFor="assetTypeId">
                 {t("assets.fields.assetType")}
-              </Label>
+              </FieldLabel>
               <Button
                 type="button"
                 variant="ghost"
@@ -136,7 +126,7 @@ export const AssetFormDialog = ({
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="assetTypeId" className="w-full">
                     <SelectValue
                       placeholder={t("assets.fields.selectAssetType")}
                     />
@@ -151,27 +141,25 @@ export const AssetFormDialog = ({
                 </Select>
               )}
             />
-            {errors.assetTypeId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.assetTypeId.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.assetTypeId]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="name">{t("assets.fields.assetName")}</Label>
+          <Field>
+            <FieldLabel htmlFor="name">
+              {t("assets.fields.assetName")}
+            </FieldLabel>
             <Input
               id="name"
               {...register("name")}
               placeholder={t("assets.fields.assetNamePlaceholder")}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
+            <FieldError errors={[errors.name]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="quantity">{t("assets.fields.quantity")}</Label>
+          <Field>
+            <FieldLabel htmlFor="quantity">
+              {t("assets.fields.quantity")}
+            </FieldLabel>
             <Controller
               name="quantity"
               control={control}
@@ -191,17 +179,13 @@ export const AssetFormDialog = ({
                 />
               )}
             />
-            {errors.quantity && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.quantity.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.quantity]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="purchasePrice">
+          <Field>
+            <FieldLabel htmlFor="purchasePrice">
               {t("assets.fields.purchasePrice")}
-            </Label>
+            </FieldLabel>
             <Controller
               name="purchasePrice"
               control={control}
@@ -221,17 +205,13 @@ export const AssetFormDialog = ({
                 />
               )}
             />
-            {errors.purchasePrice && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.purchasePrice.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.purchasePrice]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="currentSellPrice">
+          <Field>
+            <FieldLabel htmlFor="currentSellPrice">
               {t("assets.fields.currentSellPrice")}
-            </Label>
+            </FieldLabel>
             <Controller
               name="currentSellPrice"
               control={control}
@@ -251,17 +231,13 @@ export const AssetFormDialog = ({
                 />
               )}
             />
-            {errors.currentSellPrice && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.currentSellPrice.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.currentSellPrice]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="purchaseDate">
+          <Field>
+            <FieldLabel htmlFor="purchaseDate">
               {t("assets.fields.purchaseDate")}
-            </Label>
+            </FieldLabel>
             <Controller
               name="purchaseDate"
               control={control}
@@ -275,17 +251,13 @@ export const AssetFormDialog = ({
                 />
               )}
             />
-            {errors.purchaseDate && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.purchaseDate.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.purchaseDate]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="note">{t("assets.fields.note")}</Label>
+          <Field>
+            <FieldLabel htmlFor="note">{t("assets.fields.note")}</FieldLabel>
             <Textarea id="note" {...register("note")} rows={3} />
-          </div>
+          </Field>
 
           <div className="flex gap-3 pt-4">
             <Button

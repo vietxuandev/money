@@ -3,8 +3,6 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { registerSW } from "virtual:pwa-register";
 import { PWAHandler } from "./components/PWAHandler";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { AuthProvider } from "./contexts/AuthContext";
-import { SettingsProvider } from "./contexts/SettingsContext";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { apolloClient } from "./lib/apollo-client";
 import { AssetsPage } from "./pages/AssetsPage";
@@ -14,6 +12,8 @@ import { IncomesPage } from "./pages/IncomesPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { SettingsPage } from "./pages/SettingsPage";
+import { AuthProvider } from "./providers/AuthProvider";
+import { SettingsProvider } from "./providers/SettingsProvider";
 
 registerSW({ immediate: true });
 

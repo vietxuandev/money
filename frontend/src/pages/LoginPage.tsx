@@ -1,10 +1,3 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "react-i18next";
-import { createLoginSchema } from "../lib/validation";
-import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,8 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { createLoginSchema } from "../lib/validation";
 
 type LoginFormData = {
   username: string;
@@ -66,8 +66,10 @@ export const LoginPage = () => {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="username">{t("auth.login.username")}</Label>
+            <Field>
+              <FieldLabel htmlFor="username">
+                {t("auth.login.username")}
+              </FieldLabel>
               <Input
                 id="username"
                 type="text"
@@ -75,15 +77,13 @@ export const LoginPage = () => {
                 {...register("username")}
                 aria-invalid={errors.username ? "true" : "false"}
               />
-              {errors.username && (
-                <span className="text-destructive text-sm">
-                  {errors.username.message}
-                </span>
-              )}
-            </div>
+              <FieldError errors={[errors.username]} />
+            </Field>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("auth.login.password")}</Label>
+            <Field>
+              <FieldLabel htmlFor="password">
+                {t("auth.login.password")}
+              </FieldLabel>
               <Input
                 id="password"
                 type="password"
@@ -91,12 +91,8 @@ export const LoginPage = () => {
                 {...register("password")}
                 aria-invalid={errors.password ? "true" : "false"}
               />
-              {errors.password && (
-                <span className="text-destructive text-sm">
-                  {errors.password.message}
-                </span>
-              )}
-            </div>
+              <FieldError errors={[errors.password]} />
+            </Field>
 
             <Button
               type="submit"

@@ -1,4 +1,5 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSettings } from "@/hooks/useSettings";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,7 +18,6 @@ import {
   useOverallTotalValueQuery,
   useReportStatisticsQuery,
 } from "../generated/graphql";
-import { useSettings } from "../hooks/useSettings";
 import { formatCurrency } from "../lib/currency";
 
 type TimeRange = "DAY" | "WEEK" | "MONTH" | "QUARTER" | "YEAR";
@@ -83,6 +83,14 @@ export const DashboardPage = () => {
       }))
     : [];
 
+  const onTimeRangeChange = (range: TimeRange) => () => {
+    setTimeRange(range);
+  };
+
+  const toggleShowTotalValue = () => {
+    setShowTotalValue(!showTotalValue);
+  };
+
   return (
     <div className="space-y-6">
       {/* Total Value Card - Featured at Top */}
@@ -96,7 +104,7 @@ export const DashboardPage = () => {
                 {t("dashboard.totalValue")}
               </div>
               <button
-                onClick={() => setShowTotalValue(!showTotalValue)}
+                onClick={toggleShowTotalValue}
                 className="p-1 rounded hover:bg-white/20 transition"
                 aria-label={
                   showTotalValue ? "Hide total value" : "Show total value"
@@ -132,13 +140,13 @@ export const DashboardPage = () => {
               (range) => (
                 <button
                   key={range}
-                  onClick={() => setTimeRange(range)}
+                  onClick={onTimeRangeChange(range)}
                   className={`
                   px-4 py-2 rounded-lg text-sm font-medium transition
                   ${
                     timeRange === range
-                      ? "bg-white/30 backdrop-blur-sm shadow-md"
-                      : "bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                      ? "bg-white/30 shadow-md"
+                      : "bg-white/10 hover:bg-white/20"
                   }
                 `}
                 >

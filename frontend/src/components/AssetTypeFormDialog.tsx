@@ -12,8 +12,8 @@ import {
 import { createAssetTypeSchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Field, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 
 type AssetTypeFormData = z.infer<ReturnType<typeof createAssetTypeSchema>>;
@@ -51,12 +51,6 @@ export const AssetTypeFormDialog = ({
         name: editingAssetType.name,
         unit: editingAssetType.unit,
         description: editingAssetType.description || "",
-      });
-    } else {
-      reset({
-        name: "",
-        unit: "",
-        description: "",
       });
     }
   }, [editingAssetType, reset]);
@@ -119,43 +113,35 @@ export const AssetTypeFormDialog = ({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="assetTypeName">
+          <Field>
+            <FieldLabel htmlFor="assetTypeName">
               {t("assets.fields.assetTypeName")}
-            </Label>
+            </FieldLabel>
             <Input
               id="assetTypeName"
               {...register("name")}
               placeholder={t("assets.fields.assetTypeNamePlaceholder")}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
+            <FieldError errors={[errors.name]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="unit">{t("assets.fields.unit")}</Label>
+          <Field>
+            <FieldLabel htmlFor="unit">{t("assets.fields.unit")}</FieldLabel>
             <Input
               id="unit"
               {...register("unit")}
               placeholder={t("assets.fields.unitPlaceholder")}
             />
-            {errors.unit && (
-              <p className="mt-1 text-sm text-red-600">{errors.unit.message}</p>
-            )}
-          </div>
+            <FieldError errors={[errors.unit]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="description">
+          <Field>
+            <FieldLabel htmlFor="description">
               {t("assets.fields.description")}
-            </Label>
+            </FieldLabel>
             <Textarea id="description" {...register("description")} rows={3} />
-            {errors.description && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.description]} />
+          </Field>
 
           <div className="flex gap-3 pt-4">
             <Button

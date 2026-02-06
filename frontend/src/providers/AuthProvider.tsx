@@ -1,14 +1,14 @@
-import { useState, type ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
+import { AuthContext } from "@/contexts/auth-context";
 import {
+  type User,
   useMeQuery,
   useLoginMutation,
   useRegisterMutation,
-} from "../generated/graphql";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import type { User } from "../generated/graphql";
-import { AuthContext } from "./auth-context";
-import { clearApolloCache } from "../lib/apollo-client";
+} from "@/generated/graphql";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { clearApolloCache } from "@/lib/apollo-client";
+import { type ReactNode, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);

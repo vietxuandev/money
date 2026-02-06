@@ -1,10 +1,3 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslation } from "react-i18next";
-import { createRegisterSchema } from "../lib/validation";
-import { useAuth } from "../hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,8 +6,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
+import { createRegisterSchema } from "../lib/validation";
 
 type RegisterFormData = {
   username: string;
@@ -68,8 +68,10 @@ export const RegisterPage = () => {
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="username">{t("auth.register.username")}</Label>
+            <Field>
+              <FieldLabel htmlFor="username">
+                {t("auth.register.username")}
+              </FieldLabel>
               <Input
                 id="username"
                 type="text"
@@ -77,15 +79,13 @@ export const RegisterPage = () => {
                 {...registerField("username")}
                 aria-invalid={errors.username ? "true" : "false"}
               />
-              {errors.username && (
-                <span className="text-destructive text-sm">
-                  {errors.username.message}
-                </span>
-              )}
-            </div>
+              <FieldError errors={[errors.username]} />
+            </Field>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">{t("auth.register.password")}</Label>
+            <Field>
+              <FieldLabel htmlFor="password">
+                {t("auth.register.password")}
+              </FieldLabel>
               <Input
                 id="password"
                 type="password"
@@ -93,17 +93,13 @@ export const RegisterPage = () => {
                 {...registerField("password")}
                 aria-invalid={errors.password ? "true" : "false"}
               />
-              {errors.password && (
-                <span className="text-destructive text-sm">
-                  {errors.password.message}
-                </span>
-              )}
-            </div>
+              <FieldError errors={[errors.password]} />
+            </Field>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">
+            <Field>
+              <FieldLabel htmlFor="confirmPassword">
                 {t("auth.register.confirmPassword")}
-              </Label>
+              </FieldLabel>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -111,12 +107,8 @@ export const RegisterPage = () => {
                 {...registerField("confirmPassword")}
                 aria-invalid={errors.confirmPassword ? "true" : "false"}
               />
-              {errors.confirmPassword && (
-                <span className="text-destructive text-sm">
-                  {errors.confirmPassword.message}
-                </span>
-              )}
-            </div>
+              <FieldError errors={[errors.confirmPassword]} />
+            </Field>
 
             <Button
               type="submit"

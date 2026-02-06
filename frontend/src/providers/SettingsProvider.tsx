@@ -1,23 +1,23 @@
-import React, { useEffect, useState, type ReactNode } from "react";
-import { useTranslation } from "react-i18next";
+import { useAuth } from "@/contexts/auth-context";
+import { SettingsContext } from "@/contexts/settings-context";
 import {
   useUpdateUserSettingsMutation,
   useUserSettingsQuery,
   type Currency,
   type Theme,
   type UpdateSettingInput,
-} from "../generated/graphql";
-import { useAuth } from "../hooks/useAuth";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { SettingsContext } from "./settings-context";
+} from "@/generated/graphql";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { useEffect, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
+
+const SETTINGS_STORAGE_KEY = "userSettings";
 
 interface StoredSettings {
   theme: Theme;
   language: string;
   currency: Currency;
 }
-
-const SETTINGS_STORAGE_KEY = "userSettings";
 
 const DEFAULT_SETTINGS: StoredSettings = {
   theme: "LIGHT",

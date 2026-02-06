@@ -1,12 +1,20 @@
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
+import {
+  CategoriesDocument,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  type CategoriesQuery,
+  type CategoryType,
+} from "../generated/graphql";
 import { createCategorySchema } from "../lib/validation";
 import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Field, FieldDescription, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
@@ -14,14 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import {
-  useCreateCategoryMutation,
-  useUpdateCategoryMutation,
-  CategoriesDocument,
-  type CategoriesQuery,
-  type CategoryType,
-} from "../generated/graphql";
 
 type CategoryFormData = z.infer<ReturnType<typeof createCategorySchema>>;
 
@@ -120,14 +120,8 @@ export const CategoryFormDialog = ({
         type: editingCategory.type,
         parentId: editingCategory.parentId || "none",
       });
-    } else {
-      reset({
-        name: "",
-        type: type || "EXPENSE",
-        parentId: "none",
-      });
     }
-  }, [editingCategory, type, reset]);
+  }, [editingCategory, reset]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -140,20 +134,20 @@ export const CategoryFormDialog = ({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="categoryName">{t("categories.categoryName")}</Label>
+          <Field>
+            <FieldLabel htmlFor="categoryName">
+              {t("categories.categoryName")}
+            </FieldLabel>
             <Input
               id="categoryName"
               {...register("name")}
               placeholder={t("categories.categoryNamePlaceholder")}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-            )}
-          </div>
+            <FieldError errors={[errors.name]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="type">{t("categories.type")}</Label>
+          <Field>
+            <FieldLabel htmlFor="type">{t("categories.type")}</FieldLabel>
             <Controller
               name="type"
               control={control}
@@ -163,7 +157,7 @@ export const CategoryFormDialog = ({
                   onValueChange={field.onChange}
                   disabled={!!editingCategory}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="type" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
@@ -177,10 +171,12 @@ export const CategoryFormDialog = ({
                 </Select>
               )}
             />
-          </div>
+          </Field>
 
-          <div>
-            <Label htmlFor="parentId">{t("categories.parentCategory")}</Label>
+          <Field>
+            <FieldLabel htmlFor="parentId">
+              {t("categories.parentCategory")}
+            </FieldLabel>
             <Controller
               name="parentId"
               control={control}
@@ -189,7 +185,7 @@ export const CategoryFormDialog = ({
                   value={field.value || "none"}
                   onValueChange={field.onChange}
                 >
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="parentId" className="w-full">
                     <SelectValue placeholder={t("categories.noneTopLevel")} />
                   </SelectTrigger>
                   <SelectContent>
@@ -207,10 +203,10 @@ export const CategoryFormDialog = ({
                 </Select>
               )}
             />
-            <p className="text-xs text-muted-foreground mt-1">
+            <FieldDescription>
               {t("categories.parentCategoryHint")}
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
 
           <div className="flex gap-3 pt-4">
             <Button

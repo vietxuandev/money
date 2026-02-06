@@ -11,8 +11,8 @@ import { createTransactionSchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { DatePicker } from "./ui/date-picker";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Field, FieldError, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import {
   Select,
   SelectContent,
@@ -91,13 +91,6 @@ export const TransactionFormDialog = ({
         note: editingItem.note || "",
         categoryId: editingItem.categoryId,
       });
-    } else {
-      reset({
-        amount: "",
-        date: format(new Date(), "yyyy-MM-dd"),
-        note: "",
-        categoryId: "",
-      });
     }
   }, [editingItem, reset]);
 
@@ -117,10 +110,10 @@ export const TransactionFormDialog = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <div>
-            <Label htmlFor="amount">
+          <Field>
+            <FieldLabel htmlFor="amount">
               {t(`${translationKey}.fields.amount`)}
-            </Label>
+            </FieldLabel>
             <Controller
               name="amount"
               control={control}
@@ -140,15 +133,13 @@ export const TransactionFormDialog = ({
                 />
               )}
             />
-            {errors.amount && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.amount.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.amount]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="date">{t(`${translationKey}.fields.date`)}</Label>
+          <Field>
+            <FieldLabel htmlFor="date">
+              {t(`${translationKey}.fields.date`)}
+            </FieldLabel>
             <Controller
               name="date"
               control={control}
@@ -162,16 +153,14 @@ export const TransactionFormDialog = ({
                 />
               )}
             />
-            {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
-            )}
-          </div>
+            <FieldError errors={[errors.date]} />
+          </Field>
 
-          <div>
+          <Field>
             <div className="flex items-center justify-between">
-              <Label htmlFor="categoryId">
+              <FieldLabel htmlFor="categoryId">
                 {t(`${translationKey}.fields.category`)}
-              </Label>
+              </FieldLabel>
               <Button
                 type="button"
                 variant="ghost"
@@ -188,7 +177,7 @@ export const TransactionFormDialog = ({
               control={control}
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
+                  <SelectTrigger id="categoryId" className="w-full">
                     <SelectValue
                       placeholder={t(`${translationKey}.fields.selectCategory`)}
                     />
@@ -225,17 +214,15 @@ export const TransactionFormDialog = ({
                 </Select>
               )}
             />
-            {errors.categoryId && (
-              <p className="mt-1 text-sm text-red-600">
-                {errors.categoryId.message}
-              </p>
-            )}
-          </div>
+            <FieldError errors={[errors.categoryId]} />
+          </Field>
 
-          <div>
-            <Label htmlFor="note">{t(`${translationKey}.fields.note`)}</Label>
+          <Field>
+            <FieldLabel htmlFor="note">
+              {t(`${translationKey}.fields.note`)}
+            </FieldLabel>
             <Textarea id="note" {...register("note")} rows={3} />
-          </div>
+          </Field>
 
           <div className="flex gap-3 pt-4">
             <Button

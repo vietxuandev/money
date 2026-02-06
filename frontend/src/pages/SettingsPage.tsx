@@ -1,3 +1,5 @@
+import { useAuth } from "@/contexts/auth-context";
+import { useSettings } from "@/hooks/useSettings";
 import {
   DollarSign,
   Moon,
@@ -9,8 +11,8 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CategoryFormDialog } from "../components/CategoryFormDialog";
+import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { Button } from "../components/ui/button";
 import {
   Card,
@@ -37,8 +39,6 @@ import {
   type CategoriesQuery,
   type CategoryType,
 } from "../generated/graphql";
-import { useAuth } from "../hooks/useAuth";
-import { useSettings } from "../hooks/useSettings";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
