@@ -10,12 +10,20 @@ import type { AssetTypesQuery, AssetsQuery } from "../generated/graphql";
 import { createAssetSchema } from "../lib/validation";
 import { Button } from "./ui/button";
 import { DatePicker } from "./ui/date-picker";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Field, FieldError, FieldLabel } from "./ui/field";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -97,179 +105,178 @@ export const AssetFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {editingItem ? t("assets.editAsset") : t("assets.addAsset")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <Field>
-            <div className="flex items-center justify-between">
-              <FieldLabel htmlFor="assetTypeId">
-                {t("assets.fields.assetType")}
-              </FieldLabel>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={onOpenAssetTypeModal}
-                className="h-auto p-1 text-xs"
+      <form onSubmit={handleSubmit(handleFormSubmit)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingItem ? t("assets.editAsset") : t("assets.addAsset")}
+            </DialogTitle>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <FieldLabel
+                htmlFor="assetTypeId"
+                className="flex items-center justify-between"
               >
-                <Plus className="h-3 w-3 mr-1" />
-                {t("assets.quickCreateType")}
+                {t("assets.fields.assetType")}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={onOpenAssetTypeModal}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  {t("assets.quickCreateType")}
+                </Button>
+              </FieldLabel>
+              <Controller
+                name="assetTypeId"
+                control={control}
+                render={({ field }) => (
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger id="assetTypeId" className="w-full">
+                      <SelectValue
+                        placeholder={t("assets.fields.selectAssetType")}
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {assetTypes.map((type) => (
+                          <SelectItem key={type.id} value={type.id}>
+                            {type.name} ({type.unit})
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldError errors={[errors.assetTypeId]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="name">
+                {t("assets.fields.assetName")}
+              </FieldLabel>
+              <Input
+                id="name"
+                {...register("name")}
+                placeholder={t("assets.fields.assetNamePlaceholder")}
+              />
+              <FieldError errors={[errors.name]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="quantity">
+                {t("assets.fields.quantity")}
+              </FieldLabel>
+              <Controller
+                name="quantity"
+                control={control}
+                render={({ field }) => (
+                  <NumericFormat
+                    id="quantity"
+                    value={field.value}
+                    onValueChange={(values) => {
+                      field.onChange(values.value);
+                    }}
+                    thousandSeparator=","
+                    allowNegative={false}
+                    valueIsNumericString
+                    customInput={Input}
+                    placeholder="1"
+                    inputMode="numeric"
+                  />
+                )}
+              />
+              <FieldError errors={[errors.quantity]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="purchasePrice">
+                {t("assets.fields.purchasePrice")}
+              </FieldLabel>
+              <Controller
+                name="purchasePrice"
+                control={control}
+                render={({ field }) => (
+                  <NumericFormat
+                    id="purchasePrice"
+                    value={field.value}
+                    onValueChange={(values) => {
+                      field.onChange(values.value);
+                    }}
+                    thousandSeparator=","
+                    allowNegative={false}
+                    valueIsNumericString
+                    customInput={Input}
+                    placeholder="0"
+                    inputMode="numeric"
+                  />
+                )}
+              />
+              <FieldError errors={[errors.purchasePrice]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="currentSellPrice">
+                {t("assets.fields.currentSellPrice")}
+              </FieldLabel>
+              <Controller
+                name="currentSellPrice"
+                control={control}
+                render={({ field }) => (
+                  <NumericFormat
+                    id="currentSellPrice"
+                    value={field.value}
+                    onValueChange={(values) => {
+                      field.onChange(values.value);
+                    }}
+                    thousandSeparator=","
+                    allowNegative={false}
+                    valueIsNumericString
+                    customInput={Input}
+                    placeholder="0"
+                    inputMode="numeric"
+                  />
+                )}
+              />
+              <FieldError errors={[errors.currentSellPrice]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="purchaseDate">
+                {t("assets.fields.purchaseDate")}
+              </FieldLabel>
+              <Controller
+                name="purchaseDate"
+                control={control}
+                render={({ field }) => (
+                  <DatePicker
+                    value={field.value ? parseISO(field.value) : undefined}
+                    onChange={(date) => {
+                      field.onChange(date ? format(date, "yyyy-MM-dd") : "");
+                    }}
+                    placeholder={t("assets.fields.selectDate")}
+                  />
+                )}
+              />
+              <FieldError errors={[errors.purchaseDate]} />
+            </Field>
+
+            <Field>
+              <FieldLabel htmlFor="note">{t("assets.fields.note")}</FieldLabel>
+              <Textarea id="note" {...register("note")} rows={3} />
+            </Field>
+          </FieldGroup>
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline" disabled={isLoading}>
+                {t("common.cancel")}
               </Button>
-            </div>
-            <Controller
-              name="assetTypeId"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger id="assetTypeId" className="w-full">
-                    <SelectValue
-                      placeholder={t("assets.fields.selectAssetType")}
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {assetTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name} ({type.unit})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError errors={[errors.assetTypeId]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="name">
-              {t("assets.fields.assetName")}
-            </FieldLabel>
-            <Input
-              id="name"
-              {...register("name")}
-              placeholder={t("assets.fields.assetNamePlaceholder")}
-            />
-            <FieldError errors={[errors.name]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="quantity">
-              {t("assets.fields.quantity")}
-            </FieldLabel>
-            <Controller
-              name="quantity"
-              control={control}
-              render={({ field }) => (
-                <NumericFormat
-                  id="quantity"
-                  value={field.value}
-                  onValueChange={(values) => {
-                    field.onChange(values.value);
-                  }}
-                  thousandSeparator=","
-                  allowNegative={false}
-                  valueIsNumericString
-                  customInput={Input}
-                  placeholder="1"
-                  inputMode="numeric"
-                />
-              )}
-            />
-            <FieldError errors={[errors.quantity]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="purchasePrice">
-              {t("assets.fields.purchasePrice")}
-            </FieldLabel>
-            <Controller
-              name="purchasePrice"
-              control={control}
-              render={({ field }) => (
-                <NumericFormat
-                  id="purchasePrice"
-                  value={field.value}
-                  onValueChange={(values) => {
-                    field.onChange(values.value);
-                  }}
-                  thousandSeparator=","
-                  allowNegative={false}
-                  valueIsNumericString
-                  customInput={Input}
-                  placeholder="0"
-                  inputMode="numeric"
-                />
-              )}
-            />
-            <FieldError errors={[errors.purchasePrice]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="currentSellPrice">
-              {t("assets.fields.currentSellPrice")}
-            </FieldLabel>
-            <Controller
-              name="currentSellPrice"
-              control={control}
-              render={({ field }) => (
-                <NumericFormat
-                  id="currentSellPrice"
-                  value={field.value}
-                  onValueChange={(values) => {
-                    field.onChange(values.value);
-                  }}
-                  thousandSeparator=","
-                  allowNegative={false}
-                  valueIsNumericString
-                  customInput={Input}
-                  placeholder="0"
-                  inputMode="numeric"
-                />
-              )}
-            />
-            <FieldError errors={[errors.currentSellPrice]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="purchaseDate">
-              {t("assets.fields.purchaseDate")}
-            </FieldLabel>
-            <Controller
-              name="purchaseDate"
-              control={control}
-              render={({ field }) => (
-                <DatePicker
-                  value={field.value ? parseISO(field.value) : undefined}
-                  onChange={(date) => {
-                    field.onChange(date ? format(date, "yyyy-MM-dd") : "");
-                  }}
-                  placeholder={t("assets.fields.selectDate")}
-                />
-              )}
-            />
-            <FieldError errors={[errors.purchaseDate]} />
-          </Field>
-
-          <Field>
-            <FieldLabel htmlFor="note">{t("assets.fields.note")}</FieldLabel>
-            <Textarea id="note" {...register("note")} rows={3} />
-          </Field>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1"
-              disabled={isLoading}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" className="flex-1" disabled={isLoading}>
+            </DialogClose>
+            <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? editingItem
                   ? t("common.updating")
@@ -278,9 +285,9 @@ export const AssetFormDialog = ({
                   ? t("common.update")
                   : t("common.create")}
             </Button>
-          </div>
-        </form>
-      </DialogContent>
+          </DialogFooter>
+        </DialogContent>
+      </form>
     </Dialog>
   );
 };

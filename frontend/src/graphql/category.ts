@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_CATEGORIES = gql`
-  query Categories($type: String) {
-    categories(type: $type) {
+  query Categories($type: String, $isParent: Boolean) {
+    categories(type: $type, isParent: $isParent) {
       id
       name
       type
@@ -19,8 +19,16 @@ export const GET_CATEGORIES = gql`
 `;
 
 export const GET_PAGINATED_CATEGORIES = gql`
-  query PaginatedCategories($pagination: PaginationInput!, $type: String) {
-    paginatedCategories(pagination: $pagination, type: $type) {
+  query PaginatedCategories(
+    $pagination: PaginationInput!
+    $type: String
+    $isParent: Boolean
+  ) {
+    paginatedCategories(
+      pagination: $pagination
+      type: $type
+      isParent: $isParent
+    ) {
       items {
         id
         name

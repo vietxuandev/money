@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CategoryFormDialog } from "../components/CategoryFormDialog";
+import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { Pagination } from "../components/Pagination";
 import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { TransactionTable } from "../components/TransactionTable";
-import { Pagination } from "../components/Pagination";
-import { usePagination } from "../hooks/usePagination";
 import { Button } from "../components/ui/button";
 import {
-  usePaginatedIncomesQuery,
+  CategoriesDocument,
+  PaginatedIncomesDocument,
+  ReportStatisticsDocument,
   useCategoriesQuery,
   useCreateIncomeMutation,
-  useUpdateIncomeMutation,
   useDeleteIncomeMutation,
-  PaginatedIncomesDocument,
-  CategoriesDocument,
-  ReportStatisticsDocument,
+  usePaginatedIncomesQuery,
+  useUpdateIncomeMutation,
   type PaginatedIncomesQuery,
 } from "../generated/graphql";
+import { usePagination } from "../hooks/usePagination";
 
 export const IncomesPage = () => {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ export const IncomesPage = () => {
     },
   });
   const { data: categoriesData } = useCategoriesQuery({
-    variables: { type: "INCOME" },
+    variables: { type: "INCOME", isParent: true },
   });
 
   const [createIncome, { loading: isCreatingIncome }] = useCreateIncomeMutation(

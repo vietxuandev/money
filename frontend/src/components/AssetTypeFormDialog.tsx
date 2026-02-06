@@ -11,8 +11,15 @@ import {
 } from "../generated/graphql";
 import { createAssetTypeSchema } from "../lib/validation";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Field, FieldError, FieldLabel } from "./ui/field";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Field, FieldError, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 
@@ -104,60 +111,62 @@ export const AssetTypeFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {editingAssetType
-              ? t("assets.editAssetType")
-              : t("assets.addAssetType")}
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Field>
-            <FieldLabel htmlFor="assetTypeName">
-              {t("assets.fields.assetTypeName")}
-            </FieldLabel>
-            <Input
-              id="assetTypeName"
-              {...register("name")}
-              placeholder={t("assets.fields.assetTypeNamePlaceholder")}
-            />
-            <FieldError errors={[errors.name]} />
-          </Field>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingAssetType
+                ? t("assets.editAssetType")
+                : t("assets.addAssetType")}
+            </DialogTitle>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="assetTypeName">
+                {t("assets.fields.assetTypeName")}
+              </FieldLabel>
+              <Input
+                id="assetTypeName"
+                {...register("name")}
+                placeholder={t("assets.fields.assetTypeNamePlaceholder")}
+              />
+              <FieldError errors={[errors.name]} />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="unit">{t("assets.fields.unit")}</FieldLabel>
-            <Input
-              id="unit"
-              {...register("unit")}
-              placeholder={t("assets.fields.unitPlaceholder")}
-            />
-            <FieldError errors={[errors.unit]} />
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="unit">{t("assets.fields.unit")}</FieldLabel>
+              <Input
+                id="unit"
+                {...register("unit")}
+                placeholder={t("assets.fields.unitPlaceholder")}
+              />
+              <FieldError errors={[errors.unit]} />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="description">
-              {t("assets.fields.description")}
-            </FieldLabel>
-            <Textarea id="description" {...register("description")} rows={3} />
-            <FieldError errors={[errors.description]} />
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="description">
+                {t("assets.fields.description")}
+              </FieldLabel>
+              <Textarea
+                id="description"
+                {...register("description")}
+                rows={3}
+              />
+              <FieldError errors={[errors.description]} />
+            </Field>
+          </FieldGroup>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1"
-              disabled={isCreating || isUpdating}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={isCreating || isUpdating}
-            >
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isCreating || isUpdating}
+              >
+                {t("common.cancel")}
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={isCreating || isUpdating}>
               {isCreating
                 ? t("common.creating")
                 : isUpdating
@@ -166,9 +175,9 @@ export const AssetTypeFormDialog = ({
                     ? t("common.update")
                     : t("common.create")}
             </Button>
-          </div>
-        </form>
-      </DialogContent>
+          </DialogFooter>
+        </DialogContent>
+      </form>
     </Dialog>
   );
 };

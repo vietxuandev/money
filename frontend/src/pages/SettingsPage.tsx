@@ -1,3 +1,4 @@
+import { useAuth } from "@/hooks/useAuth";
 import { useSettings } from "@/hooks/useSettings";
 import {
   DollarSign,
@@ -25,6 +26,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -38,7 +40,6 @@ import {
   type CategoriesQuery,
   type CategoryType,
 } from "../generated/graphql";
-import { useAuth } from "@/hooks/useAuth";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
@@ -57,7 +58,7 @@ export const SettingsPage: React.FC = () => {
 
   const { data: categoriesData, loading: categoriesLoading } =
     useCategoriesQuery({
-      variables: { type: categoryType },
+      variables: { type: categoryType, isParent: true },
     });
 
   const [deleteCategory] = useDeleteCategoryMutation({
@@ -108,7 +109,6 @@ export const SettingsPage: React.FC = () => {
   };
 
   const categories = categoriesData?.categories || [];
-  const parentCategories = categories.filter((cat) => !cat.parentId);
 
   return (
     <div className="space-y-6">
@@ -162,8 +162,10 @@ export const SettingsPage: React.FC = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">{t("language.english")}</SelectItem>
-                <SelectItem value="vi">{t("language.vietnamese")}</SelectItem>
+                <SelectGroup>
+                  <SelectItem value="en">{t("language.english")}</SelectItem>
+                  <SelectItem value="vi">{t("language.vietnamese")}</SelectItem>
+                </SelectGroup>
               </SelectContent>
             </Select>
           </CardContent>
@@ -262,19 +264,18 @@ export const SettingsPage: React.FC = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {parentCategories.map((parent) => (
+                {categories.map((category) => (
                   <div
-                    key={parent.id}
+                    key={category.id}
                     className="border border-border rounded-lg overflow-hidden"
                   >
-                    {/* Parent Category */}
                     <div className="bg-muted px-4 py-3 flex justify-between items-center">
                       <div>
                         <h3 className="font-semibold text-card-foreground">
-                          {parent.name}
+                          {category.name}
                         </h3>
                         <p className="text-xs text-muted-foreground">
-                          {parent.children?.length || 0}{" "}
+                          {category.children?.length || 0}{" "}
                           {t("common.subcategories")}
                         </p>
                       </div>
@@ -282,14 +283,14 @@ export const SettingsPage: React.FC = () => {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(parent)}
+                          onClick={() => handleEdit(category)}
                         >
                           {t("common.edit")}
                         </Button>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDelete(parent.id)}
+                          onClick={() => handleDelete(category.id)}
                           className="text-red-600 hover:text-red-900"
                         >
                           {t("common.delete")}
@@ -297,10 +298,9 @@ export const SettingsPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Child Categories */}
-                    {parent.children && parent.children.length > 0 && (
+                    {category.children && category.children.length > 0 && (
                       <div className="bg-card divide-y divide-border">
-                        {parent.children.map((child) => (
+                        {category.children.map((child) => (
                           <div
                             key={child.id}
                             className="px-4 py-2 flex justify-between items-center hover:bg-accent"

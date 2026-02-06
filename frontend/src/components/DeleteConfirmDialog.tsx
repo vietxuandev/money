@@ -6,6 +6,7 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
@@ -46,20 +47,20 @@ export const DeleteConfirmDialog = ({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
-        <div className="flex gap-3 justify-end">
+        <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting || isLoading}>
             {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={isDeleting || isLoading}
-            className="bg-destructive text-white hover:bg-destructive/90"
+            variant="destructive"
           >
             {isDeleting || isLoading
               ? t("common.deleting")
               : t("common.delete")}
           </AlertDialogAction>
-        </div>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

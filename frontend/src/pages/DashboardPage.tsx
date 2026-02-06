@@ -1,3 +1,12 @@
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSettings } from "@/hooks/useSettings";
 import { Eye, EyeOff } from "lucide-react";
@@ -19,8 +28,10 @@ import {
   useReportStatisticsQuery,
 } from "../generated/graphql";
 import { formatCurrency } from "../lib/currency";
+import { Label } from "@/components/ui/label";
+import { Field } from "@/components/ui/field";
 
-type TimeRange = "DAY" | "WEEK" | "MONTH" | "QUARTER" | "YEAR";
+const TIME_RANGES = ["DAY", "WEEK", "MONTH", "QUARTER", "YEAR"];
 
 // Generate consistent color based on string (category name)
 function stringToColor(string: string) {
@@ -44,7 +55,7 @@ function stringToColor(string: string) {
 export const DashboardPage = () => {
   const { t } = useTranslation();
   const { currency } = useSettings();
-  const [timeRange, setTimeRange] = useState<TimeRange>("MONTH");
+  const [timeRange, setTimeRange] = useState("MONTH");
   const [showTotalValue, setShowTotalValue] = useState(false);
 
   // Query for time-filtered stats (for charts and summary cards)
@@ -83,10 +94,6 @@ export const DashboardPage = () => {
       }))
     : [];
 
-  const onTimeRangeChange = (range: TimeRange) => () => {
-    setTimeRange(range);
-  };
-
   const toggleShowTotalValue = () => {
     setShowTotalValue(!showTotalValue);
   };
@@ -103,19 +110,20 @@ export const DashboardPage = () => {
               <div className="text-sm font-medium opacity-90">
                 {t("dashboard.totalValue")}
               </div>
-              <button
+              <Button
+                variant="ghost"
                 onClick={toggleShowTotalValue}
-                className="p-1 rounded hover:bg-white/20 transition"
                 aria-label={
                   showTotalValue ? "Hide total value" : "Show total value"
                 }
+                size="icon"
               >
                 {showTotalValue ? (
                   <Eye className="h-4 w-4" />
                 ) : (
                   <EyeOff className="h-4 w-4" />
                 )}
-              </button>
+              </Button>
             </div>
             <div className="text-5xl font-bold mt-2">
               {showTotalValue ? (
@@ -135,28 +143,25 @@ export const DashboardPage = () => {
               {t("dashboard.incomeMinusExpensesPlusAssets")}
             </div>
           </div>
-          <div className="flex gap-2 flex-wrap">
-            {(["DAY", "WEEK", "MONTH", "QUARTER", "YEAR"] as TimeRange[]).map(
-              (range) => (
-                <button
-                  key={range}
-                  onClick={onTimeRangeChange(range)}
-                  className={`
-                  px-4 py-2 rounded-lg text-sm font-medium transition
-                  ${
-                    timeRange === range
-                      ? "bg-white/30 shadow-md"
-                      : "bg-white/10 hover:bg-white/20"
-                  }
-                `}
-                >
-                  {t(`dashboard.timeRange.${range.toLowerCase()}`)}
-                </button>
-              ),
-            )}
-          </div>
         </div>
       </div>
+      <Field orientation="horizontal" className="justify-end">
+        <Label>{t("dashboard.filterBy")}</Label>
+        <Select value={timeRange} onValueChange={setTimeRange}>
+          <SelectTrigger className="w-28">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              {TIME_RANGES.map((range) => (
+                <SelectItem key={range} value={range}>
+                  {t(`dashboard.timeRange.${range.toLowerCase()}`)}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </Field>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -23,8 +24,10 @@ export const LanguageSwitcher = () => {
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="en">{t("language.english")}</SelectItem>
-          <SelectItem value="vi">{t("language.vietnamese")}</SelectItem>
+          <SelectGroup>
+            <SelectItem value="en">{t("language.english")}</SelectItem>
+            <SelectItem value="vi">{t("language.vietnamese")}</SelectItem>
+          </SelectGroup>
         </SelectContent>
       </Select>
     </div>

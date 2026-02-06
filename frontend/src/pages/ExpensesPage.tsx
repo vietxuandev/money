@@ -1,23 +1,23 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
 import { CategoryFormDialog } from "../components/CategoryFormDialog";
+import { DeleteConfirmDialog } from "../components/DeleteConfirmDialog";
+import { Pagination } from "../components/Pagination";
 import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { TransactionTable } from "../components/TransactionTable";
-import { Pagination } from "../components/Pagination";
-import { usePagination } from "../hooks/usePagination";
 import { Button } from "../components/ui/button";
 import {
-  usePaginatedExpensesQuery,
+  CategoriesDocument,
+  PaginatedExpensesDocument,
+  ReportStatisticsDocument,
   useCategoriesQuery,
   useCreateExpenseMutation,
-  useUpdateExpenseMutation,
   useDeleteExpenseMutation,
-  PaginatedExpensesDocument,
-  CategoriesDocument,
-  ReportStatisticsDocument,
+  usePaginatedExpensesQuery,
+  useUpdateExpenseMutation,
   type PaginatedExpensesQuery,
 } from "../generated/graphql";
+import { usePagination } from "../hooks/usePagination";
 
 export const ExpensesPage = () => {
   const { t } = useTranslation();
@@ -39,7 +39,7 @@ export const ExpensesPage = () => {
     },
   });
   const { data: categoriesData } = useCategoriesQuery({
-    variables: { type: "EXPENSE" },
+    variables: { type: "EXPENSE", isParent: true },
   });
 
   const [createExpense, { loading: isCreatingExpense }] =

@@ -112,7 +112,8 @@
       "month": "Tháng",
       "quarter": "Quý",
       "year": "Năm"
-    }
+    },
+    "filterBy": "Lọc theo"
   },
   "expenses": {
     "title": "Chi tiêu",

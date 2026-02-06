@@ -355,6 +355,7 @@ export type QueryAssetTypeArgs = {
 
 
 export type QueryCategoriesArgs = {
+  isParent?: InputMaybe<Scalars['Boolean']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -389,6 +390,7 @@ export type QueryIncomesArgs = {
 
 
 export type QueryPaginatedCategoriesArgs = {
+  isParent?: InputMaybe<Scalars['Boolean']['input']>;
   pagination: PaginationInput;
   type?: InputMaybe<Scalars['String']['input']>;
 };
@@ -590,6 +592,7 @@ export type MeQuery = { me: { __typename: 'User', id: string, username: string, 
 
 export type CategoriesQueryVariables = Exact<{
   type?: InputMaybe<Scalars['String']['input']>;
+  isParent?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
@@ -598,6 +601,7 @@ export type CategoriesQuery = { categories: Array<{ __typename: 'Category', id: 
 export type PaginatedCategoriesQueryVariables = Exact<{
   pagination: PaginationInput;
   type?: InputMaybe<Scalars['String']['input']>;
+  isParent?: InputMaybe<Scalars['Boolean']['input']>;
 }>;
 
 
@@ -1317,8 +1321,8 @@ export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeSuspenseQueryHookResult = ReturnType<typeof useMeSuspenseQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
 export const CategoriesDocument = gql`
-    query Categories($type: String) {
-  categories(type: $type) {
+    query Categories($type: String, $isParent: Boolean) {
+  categories(type: $type, isParent: $isParent) {
     id
     name
     type
@@ -1347,6 +1351,7 @@ export const CategoriesDocument = gql`
  * const { data, loading, error } = useCategoriesQuery({
  *   variables: {
  *      type: // value for 'type'
+ *      isParent: // value for 'isParent'
  *   },
  * });
  */
@@ -1370,8 +1375,8 @@ export type CategoriesLazyQueryHookResult = ReturnType<typeof useCategoriesLazyQ
 export type CategoriesSuspenseQueryHookResult = ReturnType<typeof useCategoriesSuspenseQuery>;
 export type CategoriesQueryResult = Apollo.QueryResult<CategoriesQuery, CategoriesQueryVariables>;
 export const PaginatedCategoriesDocument = gql`
-    query PaginatedCategories($pagination: PaginationInput!, $type: String) {
-  paginatedCategories(pagination: $pagination, type: $type) {
+    query PaginatedCategories($pagination: PaginationInput!, $type: String, $isParent: Boolean) {
+  paginatedCategories(pagination: $pagination, type: $type, isParent: $isParent) {
     items {
       id
       name
@@ -1411,6 +1416,7 @@ export const PaginatedCategoriesDocument = gql`
  *   variables: {
  *      pagination: // value for 'pagination'
  *      type: // value for 'type'
+ *      isParent: // value for 'isParent'
  *   },
  * });
  */

@@ -112,7 +112,8 @@
       "month": "Month",
       "quarter": "Quarter",
       "year": "Year"
-    }
+    },
+    "filterBy": "Filter by"
   },
   "expenses": {
     "title": "Expenses",

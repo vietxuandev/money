@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { SelectGroup } from "@radix-ui/react-select";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
@@ -12,8 +13,21 @@ import {
 } from "../generated/graphql";
 import { createCategorySchema } from "../lib/validation";
 import { Button } from "./ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Field, FieldDescription, FieldError, FieldLabel } from "./ui/field";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "./ui/field";
 import { Input } from "./ui/input";
 import {
   Select,
@@ -110,8 +124,6 @@ export const CategoryFormDialog = ({
     }
   };
 
-  const parentCategories = categories.filter((cat) => !cat.parentId);
-
   // Update form when editingCategory changes
   useEffect(() => {
     if (editingCategory) {
@@ -125,104 +137,103 @@ export const CategoryFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            {editingCategory
-              ? t("categories.editCategory")
-              : t("categories.addCategory")}
-          </DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Field>
-            <FieldLabel htmlFor="categoryName">
-              {t("categories.categoryName")}
-            </FieldLabel>
-            <Input
-              id="categoryName"
-              {...register("name")}
-              placeholder={t("categories.categoryNamePlaceholder")}
-            />
-            <FieldError errors={[errors.name]} />
-          </Field>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {editingCategory
+                ? t("categories.editCategory")
+                : t("categories.addCategory")}
+            </DialogTitle>
+          </DialogHeader>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="categoryName">
+                {t("categories.categoryName")}
+              </FieldLabel>
+              <Input
+                id="categoryName"
+                {...register("name")}
+                placeholder={t("categories.categoryNamePlaceholder")}
+              />
+              <FieldError errors={[errors.name]} />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="type">{t("categories.type")}</FieldLabel>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  disabled={!!editingCategory}
-                >
-                  <SelectTrigger id="type" className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
-                    <SelectItem value="EXPENSE">
-                      {t("categories.expense")}
-                    </SelectItem>
-                    <SelectItem value="INCOME">
-                      {t("categories.income")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </Field>
+            <Field>
+              <FieldLabel htmlFor="type">{t("categories.type")}</FieldLabel>
+              <Controller
+                name="type"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={!!editingCategory}
+                  >
+                    <SelectTrigger id="type" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent onCloseAutoFocus={(e) => e.preventDefault()}>
+                      <SelectItem value="EXPENSE">
+                        {t("categories.expense")}
+                      </SelectItem>
+                      <SelectItem value="INCOME">
+                        {t("categories.income")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </Field>
 
-          <Field>
-            <FieldLabel htmlFor="parentId">
-              {t("categories.parentCategory")}
-            </FieldLabel>
-            <Controller
-              name="parentId"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value || "none"}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger id="parentId" className="w-full">
-                    <SelectValue placeholder={t("categories.noneTopLevel")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">
-                      {t("categories.noneTopLevel")}
-                    </SelectItem>
-                    {parentCategories
-                      .filter((cat) => cat.id !== editingCategory?.id)
-                      .map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id}>
-                          {cat.name}
+            <Field>
+              <FieldLabel htmlFor="parentId">
+                {t("categories.parentCategory")}
+              </FieldLabel>
+              <Controller
+                name="parentId"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value || "none"}
+                    onValueChange={field.onChange}
+                  >
+                    <SelectTrigger id="parentId" className="w-full">
+                      <SelectValue placeholder={t("categories.noneTopLevel")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="none">
+                          {t("categories.noneTopLevel")}
                         </SelectItem>
-                      ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldDescription>
-              {t("categories.parentCategoryHint")}
-            </FieldDescription>
-          </Field>
-
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              className="flex-1"
-              disabled={isCreating || isUpdating}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={isCreating || isUpdating}
-            >
+                        {categories
+                          .filter((cat) => cat.id !== editingCategory?.id)
+                          .map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              <FieldDescription>
+                {t("categories.parentCategoryHint")}
+              </FieldDescription>
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isCreating || isUpdating}
+              >
+                {t("common.cancel")}
+              </Button>
+            </DialogClose>
+            <Button type="submit" disabled={isCreating || isUpdating}>
               {isCreating
                 ? t("common.creating")
                 : isUpdating
@@ -231,9 +242,9 @@ export const CategoryFormDialog = ({
                     ? t("common.update")
                     : t("common.create")}
             </Button>
-          </div>
-        </form>
-      </DialogContent>
+          </DialogFooter>
+        </DialogContent>
+      </form>
     </Dialog>
   );
 };
