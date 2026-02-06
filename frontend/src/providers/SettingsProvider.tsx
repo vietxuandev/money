@@ -1,4 +1,3 @@
-import { useAuth } from "@/contexts/auth-context";
 import { SettingsContext } from "@/contexts/settings-context";
 import {
   useUpdateUserSettingsMutation,
@@ -7,6 +6,7 @@ import {
   type Theme,
   type UpdateSettingInput,
 } from "@/generated/graphql";
+import { useAuth } from "@/hooks/useAuth";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";

@@ -1,4 +1,3 @@
-import { useAuth } from "@/contexts/auth-context";
 import { useSettings } from "@/hooks/useSettings";
 import {
   DollarSign,
@@ -39,6 +38,7 @@ import {
   type CategoriesQuery,
   type CategoryType,
 } from "../generated/graphql";
+import { useAuth } from "@/hooks/useAuth";
 
 export const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
