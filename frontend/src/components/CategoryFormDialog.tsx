@@ -17,6 +17,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -137,15 +138,21 @@ export const CategoryFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingCategory
-                ? t("categories.editCategory")
-                : t("categories.addCategory")}
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {editingCategory
+              ? t("categories.editCategory")
+              : t("categories.addCategory")}
+          </DialogTitle>
+          <DialogDescription>
+            {editingCategory
+              ? t("categories.editCategoryDescription")
+              : t("categories.addCategoryDescription")}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} id="category-form">
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="categoryName">
@@ -223,28 +230,33 @@ export const CategoryFormDialog = ({
               </FieldDescription>
             </Field>
           </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isCreating || isUpdating}
-              >
-                {t("common.cancel")}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isCreating || isUpdating}>
-              {isCreating
-                ? t("common.creating")
-                : isUpdating
-                  ? t("common.updating")
-                  : editingCategory
-                    ? t("common.update")
-                    : t("common.create")}
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isCreating || isUpdating}
+            >
+              {t("common.cancel")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </DialogClose>
+          <Button
+            type="submit"
+            disabled={isCreating || isUpdating}
+            form="category-form"
+          >
+            {isCreating
+              ? t("common.creating")
+              : isUpdating
+                ? t("common.updating")
+                : editingCategory
+                  ? t("common.update")
+                  : t("common.create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

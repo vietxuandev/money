@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, parseISO } from "date-fns";
 import { Plus } from "lucide-react";
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { NumericFormat } from "react-number-format";
@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -106,19 +107,25 @@ export const TransactionFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem
-                ? t(
-                    `${translationKey}.edit${type === "expense" ? "Expense" : "Income"}`,
-                  )
-                : t(
-                    `${translationKey}.add${type === "expense" ? "Expense" : "Income"}`,
-                  )}
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {editingItem
+              ? t(
+                  `${translationKey}.edit${type === "expense" ? "Expense" : "Income"}`,
+                )
+              : t(
+                  `${translationKey}.add${type === "expense" ? "Expense" : "Income"}`,
+                )}
+          </DialogTitle>
+          <DialogDescription>
+            {editingItem
+              ? t(`${translationKey}.editDescription`)
+              : t(`${translationKey}.addDescription`)}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(handleFormSubmit)} id="transaction-form">
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="amount">
@@ -196,9 +203,9 @@ export const TransactionFormDialog = ({
                     </SelectTrigger>
                     <SelectContent>
                       {categories.map((category, index) => (
-                        <>
+                        <Fragment key={category.id}>
                           {category.children && category.children.length > 0 ? (
-                            <SelectGroup key={category.id}>
+                            <SelectGroup>
                               <SelectLabel>{category.name}</SelectLabel>
                               {category.children.map((item) => (
                                 <SelectItem key={item.id} value={item.id}>
@@ -207,14 +214,14 @@ export const TransactionFormDialog = ({
                               ))}
                             </SelectGroup>
                           ) : (
-                            <SelectGroup key={category.id}>
+                            <SelectGroup>
                               <SelectItem value={category.id}>
                                 {category.name}
                               </SelectItem>
                             </SelectGroup>
                           )}
                           {index < categories.length - 1 && <SelectSeparator />}
-                        </>
+                        </Fragment>
                       ))}
                     </SelectContent>
                   </Select>
@@ -230,24 +237,25 @@ export const TransactionFormDialog = ({
               <Textarea id="note" {...register("note")} rows={3} />
             </Field>
           </FieldGroup>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isLoading}>
-                {t("common.cancel")}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? editingItem
-                  ? t("common.updating")
-                  : t("common.creating")
-                : editingItem
-                  ? t("common.update")
-                  : t("common.create")}
+        </form>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" disabled={isLoading}>
+              {t("common.cancel")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </DialogClose>
+          <Button type="submit" disabled={isLoading} form="transaction-form">
+            {isLoading
+              ? editingItem
+                ? t("common.updating")
+                : t("common.creating")
+              : editingItem
+                ? t("common.update")
+                : t("common.create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

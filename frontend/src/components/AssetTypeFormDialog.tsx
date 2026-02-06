@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -111,15 +112,21 @@ export const AssetTypeFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingAssetType
-                ? t("assets.editAssetType")
-                : t("assets.addAssetType")}
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {editingAssetType
+              ? t("assets.editAssetType")
+              : t("assets.addAssetType")}
+          </DialogTitle>
+          <DialogDescription>
+            {editingAssetType
+              ? t("assets.editAssetTypeDescription")
+              : t("assets.addAssetTypeDescription")}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} id="asset-type-form">
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="assetTypeName">
@@ -155,29 +162,33 @@ export const AssetTypeFormDialog = ({
               <FieldError errors={[errors.description]} />
             </Field>
           </FieldGroup>
+        </form>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={isCreating || isUpdating}
-              >
-                {t("common.cancel")}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isCreating || isUpdating}>
-              {isCreating
-                ? t("common.creating")
-                : isUpdating
-                  ? t("common.updating")
-                  : editingAssetType
-                    ? t("common.update")
-                    : t("common.create")}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isCreating || isUpdating}
+            >
+              {t("common.cancel")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </DialogClose>
+          <Button
+            type="submit"
+            disabled={isCreating || isUpdating}
+            form="asset-type-form"
+          >
+            {isCreating
+              ? t("common.creating")
+              : isUpdating
+                ? t("common.updating")
+                : editingAssetType
+                  ? t("common.update")
+                  : t("common.create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

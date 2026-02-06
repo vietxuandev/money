@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -105,13 +106,18 @@ export const AssetFormDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <form onSubmit={handleSubmit(handleFormSubmit)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {editingItem ? t("assets.editAsset") : t("assets.addAsset")}
-            </DialogTitle>
-          </DialogHeader>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>
+            {editingItem ? t("assets.editAsset") : t("assets.addAsset")}
+          </DialogTitle>
+          <DialogDescription>
+            {editingItem
+              ? t("assets.editAssetDescription")
+              : t("assets.addAssetDescription")}
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(handleFormSubmit)} id="asset-form">
           <FieldGroup>
             <Field>
               <FieldLabel
@@ -269,25 +275,25 @@ export const AssetFormDialog = ({
               <Textarea id="note" {...register("note")} rows={3} />
             </Field>
           </FieldGroup>
+        </form>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isLoading}>
-                {t("common.cancel")}
-              </Button>
-            </DialogClose>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading
-                ? editingItem
-                  ? t("common.updating")
-                  : t("common.creating")
-                : editingItem
-                  ? t("common.update")
-                  : t("common.create")}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button" variant="outline" disabled={isLoading}>
+              {t("common.cancel")}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </form>
+          </DialogClose>
+          <Button type="submit" disabled={isLoading} form="asset-form">
+            {isLoading
+              ? editingItem
+                ? t("common.updating")
+                : t("common.creating")
+              : editingItem
+                ? t("common.update")
+                : t("common.create")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };
