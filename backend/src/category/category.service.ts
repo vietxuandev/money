@@ -9,14 +9,21 @@ import { PageInfo } from "../common/models/pagination.model";
 export class CategoryService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(
-    userId: string,
-    type?: CategoryType,
-    pagination?: PaginationInput,
-  ) {
+  async findAll({
+    userId,
+    type,
+    pagination,
+    isParent,
+  }: {
+    userId: string;
+    type?: CategoryType;
+    pagination?: PaginationInput;
+    isParent?: boolean;
+  }) {
     const where = {
       userId,
       ...(type && { type }),
+      ...(isParent && { parentId: null }),
     };
 
     // If no pagination provided, return all items (backward compatibility)

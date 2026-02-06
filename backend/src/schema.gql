@@ -211,7 +211,7 @@ type Query {
   assetType(id: String!): AssetType
   assetTypes: [AssetType!]!
   assets: [Asset!]!
-  categories(type: String): [Category!]!
+  categories(isParent: Boolean, type: String): [Category!]!
   category(id: String!): Category
   expense(id: String!): Expense
   expenses(endDate: DateTime, sort: ExpenseSortInput, startDate: DateTime): [Expense!]!
@@ -219,7 +219,7 @@ type Query {
   incomes(endDate: DateTime, sort: IncomeSortInput, startDate: DateTime): [Income!]!
   me: User!
   overallTotalValue: OverallTotalValue!
-  paginatedCategories(pagination: PaginationInput!, type: String): PaginatedCategories!
+  paginatedCategories(isParent: Boolean, pagination: PaginationInput!, type: String): PaginatedCategories!
   paginatedExpenses(endDate: DateTime, pagination: PaginationInput!, sort: ExpenseSortInput, startDate: DateTime): PaginatedExpenses!
   paginatedIncomes(endDate: DateTime, pagination: PaginationInput!, sort: IncomeSortInput, startDate: DateTime): PaginatedIncomes!
   reportStatistics(range: String!, referenceDate: DateTime): ReportStatistics!

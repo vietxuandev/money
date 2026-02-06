@@ -36,7 +36,7 @@ export function DatePicker({
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant="outline"
           disabled={disabled}
           className={cn(
             "w-full justify-start text-left font-normal",
@@ -52,7 +52,7 @@ export function DatePicker({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent>
         <Calendar
           mode="single"
           selected={value}

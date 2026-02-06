@@ -18,8 +18,14 @@ export class CategoryResolver {
   async categories(
     @CurrentUser() user: User,
     @Args("type", { type: () => String, nullable: true }) type?: CategoryType,
+    @Args("isParent", { type: () => Boolean, nullable: true })
+    isParent?: boolean,
   ) {
-    return this.categoryService.findAll(user.id, type);
+    return this.categoryService.findAll({
+      userId: user.id,
+      type,
+      isParent,
+    });
   }
 
   @Query(() => PaginatedCategories)
@@ -28,8 +34,15 @@ export class CategoryResolver {
     @Args("pagination", { type: () => PaginationInput })
     pagination: PaginationInput,
     @Args("type", { type: () => String, nullable: true }) type?: CategoryType,
+    @Args("isParent", { type: () => Boolean, nullable: true })
+    isParent?: boolean,
   ) {
-    return this.categoryService.findAll(user.id, type, pagination);
+    return this.categoryService.findAll({
+      userId: user.id,
+      type,
+      pagination,
+      isParent,
+    });
   }
 
   @Query(() => Category, { nullable: true })
