@@ -7,7 +7,6 @@ import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { TransactionTable } from "../components/TransactionTable";
 import { Button } from "../components/ui/button";
 import {
-  CategoriesDocument,
   PaginatedIncomesDocument,
   ReportStatisticsDocument,
   useCategoriesQuery,
@@ -51,7 +50,6 @@ export const IncomesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "INCOME" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,
@@ -70,7 +68,6 @@ export const IncomesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "INCOME" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,
@@ -89,7 +86,6 @@ export const IncomesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "INCOME" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,

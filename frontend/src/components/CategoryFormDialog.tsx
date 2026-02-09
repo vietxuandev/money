@@ -77,8 +77,14 @@ export const CategoryFormDialog = ({
 
   const [createCategory, { loading: isCreating }] = useCreateCategoryMutation({
     refetchQueries: [
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
+      {
+        query: CategoriesDocument,
+        variables: { type: "EXPENSE", isParent: true },
+      },
+      {
+        query: CategoriesDocument,
+        variables: { type: "INCOME", isParent: true },
+      },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {
@@ -88,8 +94,14 @@ export const CategoryFormDialog = ({
 
   const [updateCategory, { loading: isUpdating }] = useUpdateCategoryMutation({
     refetchQueries: [
-      { query: CategoriesDocument, variables: { type: "EXPENSE" } },
-      { query: CategoriesDocument, variables: { type: "INCOME" } },
+      {
+        query: CategoriesDocument,
+        variables: { type: "EXPENSE", isParent: true },
+      },
+      {
+        query: CategoriesDocument,
+        variables: { type: "INCOME", isParent: true },
+      },
     ],
     awaitRefetchQueries: true,
     onCompleted: () => {

@@ -7,7 +7,6 @@ import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { TransactionTable } from "../components/TransactionTable";
 import { Button } from "../components/ui/button";
 import {
-  CategoriesDocument,
   PaginatedExpensesDocument,
   ReportStatisticsDocument,
   useCategoriesQuery,
@@ -51,7 +50,6 @@ export const ExpensesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,
@@ -69,7 +67,6 @@ export const ExpensesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,
@@ -87,7 +84,6 @@ export const ExpensesPage = () => {
             pagination: { page: currentPage, limit: itemsPerPage },
           },
         },
-        { query: CategoriesDocument, variables: { type: "EXPENSE" } },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
       ],
       awaitRefetchQueries: true,
