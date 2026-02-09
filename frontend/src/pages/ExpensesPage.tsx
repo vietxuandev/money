@@ -7,6 +7,7 @@ import { TransactionFormDialog } from "../components/TransactionFormDialog";
 import { TransactionTable } from "../components/TransactionTable";
 import { Button } from "../components/ui/button";
 import {
+  OverallTotalValueDocument,
   PaginatedExpensesDocument,
   ReportStatisticsDocument,
   useCategoriesQuery,
@@ -51,6 +52,9 @@ export const ExpensesPage = () => {
           },
         },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+        {
+          query: OverallTotalValueDocument,
+        },
       ],
       awaitRefetchQueries: true,
       onCompleted: () => {
@@ -68,6 +72,9 @@ export const ExpensesPage = () => {
           },
         },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+        {
+          query: OverallTotalValueDocument,
+        },
       ],
       awaitRefetchQueries: true,
       onCompleted: () => {
@@ -85,6 +92,9 @@ export const ExpensesPage = () => {
           },
         },
         { query: ReportStatisticsDocument, variables: { range: "MONTH" } },
+        {
+          query: OverallTotalValueDocument,
+        },
       ],
       awaitRefetchQueries: true,
     });
